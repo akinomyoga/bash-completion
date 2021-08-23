@@ -80,6 +80,9 @@ _man()
     COMPREPLY=($(eval command ls "$manpath" 2>/dev/null))
     $reset
 
+    if [[ $DIST == centos7 ]]; then
+      echo -n 'A '; declare -p COMPREPLY | cat -A >&1
+    fi
     if ((${#COMPREPLY[@]} != 0)); then
         # weed out directory path names and paths to man pages
         COMPREPLY=(${COMPREPLY[@]##*/?(:)})
@@ -88,6 +91,9 @@ _man()
         COMPREPLY=($(compgen -W '${COMPREPLY[@]%.*}' -- "${cur//\\\\/}"))
         # ((${#COMPREPLY[@]})) &&
         #     COMPREPLY=($(compgen -W '"${COMPREPLY[@]%.*}"' -- "${cur//\\\\/}"))
+        if [[ $DIST == centos7 ]]; then
+          echo -n 'B '; declare -p COMPREPLY | cat -A >&1
+        fi
     fi
 
     # shellcheck disable=SC2053
@@ -101,7 +107,13 @@ _man()
         done
     fi
 
+    if [[ $DIST == centos7 ]]; then
+      echo -n "C($prev,$mansect): "; declare -p COMPREPLY | cat -A >&1
+    fi
     __ltrim_colon_completions "$cur"
+    if [[ $DIST == centos7 ]]; then
+      echo -n 'D '; declare -p COMPREPLY | cat -A >&1
+    fi
 } &&
     complete -F _man man apropos whatis
 
