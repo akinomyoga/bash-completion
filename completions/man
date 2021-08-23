@@ -80,9 +80,11 @@ _man()
     COMPREPLY=($(eval command ls "$manpath" 2>/dev/null))
     $reset
 
-    if [[ $DIST == centos7 ]] && ((${#COMPREPLY[@]}==0)); then
-      declare -p manpath COMPREPLY | cat -A >&1
-      type ls | cat -A >&1
+    if [[ $DIST == centos7 ]] && ((${#COMPREPLY[@]} == 0)); then
+        declare -p manpath COMPREPLY | cat -A >&1
+        type ls | cat -A >&1
+        eval command ls "$manpath" |& cat -A >&1
+        command ls -la /dev/null | cat -A >&1
     fi
     if ((${#COMPREPLY[@]} != 0)); then
         # weed out directory path names and paths to man pages
