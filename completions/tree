@@ -32,11 +32,17 @@ _comp_cmd_tree()
 
     if [[ ${words[*]} == *\ --fromfile\ * ]]; then
         if [[ $DIST == centos7 && ${words[1]-} == --fromfile ]]; then
+            echo "A:$BASH_VERSION" >&1
             declare -p words IFS | cat -A >&1
             ls -la >&1
         fi
         _filedir
     else
+        if [[ $DIST == centos7 && ${words[1]-} == --fromfile ]]; then
+            echo "B:$BASH_VERSION" >&1
+            declare -p words IFS | cat -A >&1
+            ls -la >&1
+        fi
         _filedir -d
     fi
 } &&
