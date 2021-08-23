@@ -90,13 +90,10 @@ _man()
         # weed out directory path names and paths to man pages
         COMPREPLY=(${COMPREPLY[@]##*/?(:)})
         # strip suffix from man pages
-        COMPREPLY=(${COMPREPLY[@]%$comprsuffix})
-        COMPREPLY=($(compgen -W '${COMPREPLY[@]%.*}' -- "${cur//\\\\/}"))
-        # ((${#COMPREPLY[@]})) &&
-        #     COMPREPLY=($(compgen -W '"${COMPREPLY[@]%.*}"' -- "${cur//\\\\/}"))
-        if [[ $DIST == centos7 ]]; then
-          echo -n 'B '; declare -p COMPREPLY | cat -A >&1
-        fi
+        ((${#COMPREPLY[@]})) &&
+            COMPREPLY=(${COMPREPLY[@]%$comprsuffix})
+        ((${#COMPREPLY[@]})) &&
+            COMPREPLY=($(compgen -W '"${COMPREPLY[@]%.*}"' -- "${cur//\\\\/}"))
     fi
 
     # shellcheck disable=SC2053
