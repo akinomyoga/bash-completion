@@ -30,6 +30,9 @@ _comp_cmd_tree()
         return
     fi
 
+    if [[ $DIST == centos7 ]]; then
+        declare -p words IFS | cat -v >&1
+    fi
     if [[ ${words[*]} == *\ --fromfile\ * ]]; then
         _filedir
     else
