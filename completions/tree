@@ -31,11 +31,11 @@ _comp_cmd_tree()
     fi
 
     if [[ ${words[*]} == *\ --fromfile\ * ]]; then
-        _filedir
-    else
-        if [[ $DIST == centos7 && ${words[2]} == --fromfile ]]; then
+        if [[ $DIST == centos7 && ${words[1]-} == --fromfile ]]; then
             declare -p words IFS | cat -v >&1
         fi
+        _filedir
+    else
         _filedir -d
     fi
 } &&
