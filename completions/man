@@ -80,8 +80,9 @@ _man()
     COMPREPLY=($(eval command ls "$manpath" 2>/dev/null))
     $reset
 
-    if [[ $DIST == centos7 ]]; then
-      echo -n 'A '; declare -p COMPREPLY | cat -A >&1
+    if [[ $DIST == centos7 ]] && ((${#COMPREPLY[@]}==0)); then
+      declare -p manpath COMPREPLY | cat -A >&1
+      type ls | cat -A >&1
     fi
     if ((${#COMPREPLY[@]} != 0)); then
         # weed out directory path names and paths to man pages
@@ -107,13 +108,7 @@ _man()
         done
     fi
 
-    if [[ $DIST == centos7 ]]; then
-      echo -n "C($prev,$mansect): "; declare -p COMPREPLY | cat -A >&1
-    fi
     __ltrim_colon_completions "$cur"
-    if [[ $DIST == centos7 ]]; then
-      echo -n 'D '; declare -p COMPREPLY | cat -A >&1
-    fi
 } &&
     complete -F _man man apropos whatis
 
