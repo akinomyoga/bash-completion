@@ -80,19 +80,23 @@ _comp_cmd_rsync()
 
     case $cur in
         -*)
-            local tmp
-            # Account for the fact that older rsync versions (before cba00be6,
-            # meaning before v3.2.0) contain the following unusual line in
-            # --help:
-            # "(-h) --help                  show this help (-h is --help only if used alone)"
-            if _comp_compgen -Rv tmp help - <<<"$("$1" --help 2>&1 | command sed -e 's/^([^)]*)//')"; then
-
-                _comp_compgen -- -W '"${tmp[@]}"
-                    --daemon --old-d{,irs}
-                    --no-{blocking-io,detach,whole-file,inc-recursive,i-r}' -X '--no-OPTION'
-            # We didn't find any options using _comp_compgen_help, try _usage for BSD style usage
+            if _comp_contains_word : '--@(daemon|config|dparam|detach|no-detach)'; then
+                _comp_compgen -R help -- --daemon --help
             else
-                _comp_compgen_usage
+                local tmp
+                # Account for the fact that older rsync versions (before
+                # cba00be6, meaning before v3.2.0) contain the following
+                # unusual line in --help:
+                # "(-h) --help                  show this help (-h is --help only if used alone)"
+                if _comp_compgen -Rv tmp help - <<<"$("$1" --help 2>&1 | command sed -e 's/^([^)]*)//')"; then
+
+                    _comp_compgen -- -W '"${tmp[@]}" --daemon --old-d{,irs}
+                        --no-{blocking-io,detach,whole-file,inc-recursive,i-r}' \
+                        -X '--no-OPTION'
+                # We didn't find any options using _comp_compgen_help, try _usage for BSD style usage
+                else
+                    _comp_compgen_usage
+                fi
             fi
             [[ ${COMPREPLY-} == *= ]] || compopt +o nospace
             ;;
