@@ -2476,6 +2476,24 @@ _comp_count_args()
     done
 }
 
+# This function tests if the specified word is contained in the
+# arguments.
+# @param $1 chars  Characters out of $COMP_WORDBREAKS which should
+#     NOT be considered word breaks. See __reassemble_comp_words_by_ref.
+# @param $2 glob   Words that are looked for.
+_comp_contains_word()
+{
+    local word cword words
+    __reassemble_comp_words_by_ref "${1-}" words cword
+    for word in "${words[@]:1:cword-1}"; do
+        # shellcheck disable=SC2053
+        if [[ ${words[i]} == ${2-} ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # This function completes on PCI IDs
 #
 # @since 2.12
