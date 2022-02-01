@@ -89,16 +89,40 @@ _comp_cmd_rsync()
                 # unusual line in --help:
                 # "(-h) --help                  show this help (-h is --help only if used alone)"
                 if _comp_compgen -Rv help_options help - <<<"$("$1" --help 2>&1 | command sed -e 's/^([^)]*)//')"; then
-                    # Synthesize "--no-OPTION" and examine them by the output
-                    # of "strings -d /path/to/rsync"
+                    # Examine possible options by testing whether they are
+                    # actually contained in the output of "strings -d
+                    # /path/to/rsync".  Note: The option names "--OPTION" are
+                    # included as "OPTION" in the original source code of
+                    # "rsync" but maybe compiled as suffixes of longer strings
+                    # used elsewhere---such as "--OPTION", "no-OPTION",
+                    # "--no-OPTION"---by the compiler optimization.
                     local -a confirmed_options
                     _comp_split -l confirmed_options "$(
-                        printf '%s\n' "${help_options[@]}" |
-                            awk 'sub(/^--?/,"--no-"){sub(/=$/,"");print}' |
-                            command grep -Fxe "$(strings -d "$(type -P "$1")" | command sed -n 's/^no-/--&/p')"
+                        {
+                            # These are the options that are not included in
+                            # "--help" but can be available depending on the rsync
+                            # version.
+                            printf '%s\n' --config= --daemon --{,no-}detach \
+                                --dparam= --fsync --ignore-non-existing \
+                                --{,no-}implied-dirs --{,no-}i-d --{,no-}i-r \
+                                --{,no-}inc-recursive --motd \
+                                --{,no-}msgs2stderr --{new,old}-compress \
+                                --no-{8,A,H,J,N,O,R,S,U,W,X,c,d,g,h,i,l,m,o,p,r,s,t,v,x,y,z} \
+                                --no-relative --no-specials --old-d{,irs} \
+                                --qsort --sender --server --time-limit=
+
+                            # We synthesize options of the form "--no-OPTION" from
+                            # the options extracted from "rsync --help".
+                            printf '%s\n' "${help_options[@]}" |
+                                awk 'sub(/^--?/,"--no-"){sub(/=$/,"");print}'
+                        } | command grep -Exe "$(
+                            strings -d "$(type -P "$1")" 2>/dev/null |
+                                command sed -n '/[^-a-zA-Z0-9]/d;s/$/=?/;/^--[a-zA-Z]/p;s/^[a-zA-Z]/--&/p;s/^--no-/--/p'
+                        )"
                     )"
-                    _comp_compgen -- -W '"${help_options[@]}"
-                        "${confirmed_options[@]}"' -X '--no-OPTION'
+                    
+                    _comp_compgen -- -W '$(printf '%s\n' "${help_options[@]}" \
+                        "${confirmed_options[@]}" | sort -u)' -X '--no-OPTION'
 
                 # We didn't find any options using _comp_compgen_help, try _usage for BSD style usage
                 else
