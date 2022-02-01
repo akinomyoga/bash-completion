@@ -120,9 +120,28 @@ _comp_cmd_rsync()
                                 command sed -n '/[^-a-zA-Z0-9]/d;s/$/=?/;/^--[a-zA-Z]/p;s/^[a-zA-Z]/--&/p;s/^--no-/--/p'
                         )"
                     )"
+
+                    # These options cannot be tested by "strings -d
+                    # /path/to/rsync" because they are too short to extract
+                    # using "strings".  We manually generate them when rsync is
+                    # likely to suppor the feature.
+                    local -a hardcoded_options=()
+                    # * "--compress-choice" and its synonyms "--cc" and "--zc"
+                    #   are available in rsync-3.2.0.
+                    [[ " ${help_options[*]} " == *' --compress-choice= '* ]] &&
+                        hardcoded_options+=(--cc= --zc=)
+                    # * The short name "--zl" for "--compress-level" has been
+                    #   introduced in rsync-3.2.1.  We here abuse the fact that
+                    #   another option "--early-info" is also introduced in
+                    #   rsync-3.2.1.  We also confirm that rsync actually
+                    #   supports the feature by checking the longer option.
+                    [[ " ${help_options[*]} " == *' --early-info= '* ]] &&
+                        [[ " ${help_options[*]} " == *' --compress-level= '* ]] &&
+                        hardcoded_options+=(--zl=)
                     
                     _comp_compgen -- -W '$(printf '%s\n' "${help_options[@]}" \
-                        "${confirmed_options[@]}" | sort -u)' -X '--no-OPTION'
+                        "${confirmed_options[@]}" "${hardcoded_options[@]}" | \
+                        sort -u)' -X '--no-OPTION'
 
                 # We didn't find any options using _comp_compgen_help, try _usage for BSD style usage
                 else
