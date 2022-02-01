@@ -83,16 +83,23 @@ _comp_cmd_rsync()
             if _comp_contains_word : '--@(daemon|config|dparam|detach|no-detach)'; then
                 _comp_compgen -R help -- --daemon --help
             else
-                local tmp
+                local help_options
                 # Account for the fact that older rsync versions (before
                 # cba00be6, meaning before v3.2.0) contain the following
                 # unusual line in --help:
                 # "(-h) --help                  show this help (-h is --help only if used alone)"
-                if _comp_compgen -Rv tmp help - <<<"$("$1" --help 2>&1 | command sed -e 's/^([^)]*)//')"; then
+                if _comp_compgen -Rv help_options help - <<<"$("$1" --help 2>&1 | command sed -e 's/^([^)]*)//')"; then
+                    # Synthesize "--no-OPTION" and examine them by the output
+                    # of "strings -d /path/to/rsync"
+                    local -a confirmed_options
+                    _comp_split -l confirmed_options "$(
+                        printf '%s\n' "${help_options[@]}" |
+                            awk 'sub(/^--?/,"--no-"){sub(/=$/,"");print}' |
+                            command grep -Fxe "$(strings -d "$(type -P "$1")" | command sed -n 's/^no-/--&/p')"
+                    )"
+                    _comp_compgen -- -W '"${help_options[@]}"
+                        "${confirmed_options[@]}"' -X '--no-OPTION'
 
-                    _comp_compgen -- -W '"${tmp[@]}" --daemon --old-d{,irs}
-                        --no-{blocking-io,detach,whole-file,inc-recursive,i-r}' \
-                        -X '--no-OPTION'
                 # We didn't find any options using _comp_compgen_help, try _usage for BSD style usage
                 else
                     _comp_compgen_usage
