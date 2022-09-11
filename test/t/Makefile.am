@@ -2,7 +2,9 @@ SUBDIRS = unit
 
 EXTRA_DIST = \
 	conftest.py \
-	test_alias.py
+	test_alias.py \
+	test_apt_cache.py \
+	test_cd.py
 
 all:
 
