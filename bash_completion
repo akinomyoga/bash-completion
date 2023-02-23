@@ -568,19 +568,19 @@ _get_comp_words_by_ref()
 
     [[ -v vcur ]] && {
         upvars+=("$vcur")
-        upargs+=(-v $vcur "$cur")
+        upargs+=(-v "$vcur" "$cur")
     }
     [[ -v vcword ]] && {
         upvars+=("$vcword")
-        upargs+=(-v $vcword "$cword")
+        upargs+=(-v "$vcword" "$cword")
     }
     [[ -v vprev && $cword -ge 1 ]] && {
         upvars+=("$vprev")
-        upargs+=(-v $vprev "${words[cword - 1]}")
+        upargs+=(-v "$vprev" "${words[cword - 1]}")
     }
     [[ -v vwords ]] && {
         upvars+=("$vwords")
-        upargs+=(-a${#words[@]} $vwords ${words+"${words[@]}"})
+        upargs+=(-a"${#words[@]}" "$vwords" ${words+"${words[@]}"})
     }
 
     ((${#upvars[@]})) && local "${upvars[@]}" && _upvars "${upargs[@]}"
