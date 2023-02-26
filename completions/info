@@ -52,7 +52,9 @@ _info()
     _comp_split -F : infopath "$infopath"
     if ((${#infopath[@]})); then
         infopath=("${infopath[@]/%//$cur*}")
-        IFS= _comp_expand_glob COMPREPLY '${infopath[@]}'
+        local IFS=
+        _comp_expand_glob COMPREPLY '${infopath[@]}'
+        _comp_unlocal IFS
 
         if ((${#COMPREPLY[@]})); then
             # weed out directory path names and paths to info pages (empty
