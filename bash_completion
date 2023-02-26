@@ -231,6 +231,7 @@ _comp_unlocal()
 # @see https://fvue.nl/wiki/Bash:_Passing_variables_by_reference
 _upvars()
 {
+    local -a debug_args=("$@")
     if ! (($#)); then
         echo "bash_completion: $FUNCNAME: usage: $FUNCNAME" \
             "[-v varname value] | [-aN varname [value ...]] ..." >&2
@@ -272,6 +273,16 @@ _upvars()
                 ;;
             *)
                 echo "bash_completion: $FUNCNAME: $1: invalid option" >&2
+
+                {
+                    local i=0 str=""
+                    declare -p BASH_VERSION IFS | cat -v
+                    for ((i = 1; i < ${#FUNCNAME}; i++)); do
+                        str+="${FUNCNAME[i]-} (${BASH_SOURCE[i]-}:${BASH_LINENO[i - 1]-})"$'\n'
+                    done
+                    echo "$str"
+                    declare -p debug_args COMP_WORDS words
+                } >&2
                 return 1
                 ;;
         esac
