@@ -827,7 +827,8 @@ _comp_delimited()
         COMPREPLY=($(compgen "$@" -- "${cur##*"$delimiter"}"))
     fi
 
-    ((${#COMPREPLY[@]} == 1)) && COMPREPLY=(${COMPREPLY/#/$prefix})
+    ((${#COMPREPLY[@]})) && COMPREPLY=("${COMPREPLY[@]/#/"$prefix"}")
+
     [[ $delimiter != : ]] || __ltrim_colon_completions "$cur"
 }
 
