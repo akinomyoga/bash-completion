@@ -41,6 +41,21 @@ _comp_cmd_inotifywait()
         return
     fi
 
+    if [[ $cur == @* ]]; then
+        # TODO: Or another way is to add -P to _comp_compgen, automatically
+        # arrange `-c "${cur#$prefix}"`, and other processing to filenames are
+        # performed before prefixing `-P "$prefix"`.
+        # TODO: Also, I think there are many similar cases in the codebase.
+        # ./completions/7z:31:                _comp_compgen -c "${cur#*@}" -- -P"${opt}${cur%%@*}@" -f
+        # ./completions/upgradepkg:18:        _comp_compgen -- -P "$prev%" -f -X "!*.@(t[bgxl]z)" || nofiles=set
+        # If we extend -P usage to others, there are even more cases where "-c
+        # cur" is adjusted at the same time.
+        local files
+        _comp_compgen -v files -c "${cur:1}" filedir -f &&
+            _comp_compgen -R -- -W '"${files[@]}"' -P @ &&
+            return 0
+    fi
+
     _comp_compgen_filedir
 } &&
     complete -F _comp_cmd_inotifywait inotifywait inotifywatch
