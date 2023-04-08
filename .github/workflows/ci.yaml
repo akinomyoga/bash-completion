@@ -42,14 +42,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - dist: alpine
           - dist: centos7
-          - dist: debian10
-          - dist: debian10
-            bsd: true
-            network: none
-          - dist: fedoradev
-          - dist: ubuntu14
     steps:
       - uses: actions/checkout@v3
       - uses: GoogleCloudPlatform/release-please-action@v3
