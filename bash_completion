@@ -3450,13 +3450,13 @@ _comp_load()
     done
     shift "$((OPTIND - 1))"
 
-    local rawcmd=$1 dir compfile
+    local rawcmd=$1 REPLY dir compfile
     local -a paths
 
     # Unquote the beginning backslash
-    local origcmd=$rawcmd
-    if [[ $rawcmd == \\* ]]; then
-        origcmd=${rawcmd:1}
+    _comp_dequote "$rawcmd"
+    local origcmd=$REPLY
+    if [[ $origcmd != "$rawcmd" ]]; then
         # If we already have a completion for the "real" command, use it
         eval -- "$(complete -p -- "$origcmd" 2>/dev/null || echo false) \"\$rawcmd\"" && return 0
     fi
@@ -3465,7 +3465,7 @@ _comp_load()
     [[ $cmdname ]] || return 1
 
     # Resolve absolute path to $cmd
-    local REPLY cmd=$origcmd
+    local cmd=$origcmd
     if REPLY=$(type -P -- "$cmd"); then
         _comp_abspath "$REPLY"
         cmd=$REPLY
