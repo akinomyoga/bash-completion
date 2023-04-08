@@ -17,7 +17,7 @@ class TestUtilCompgen:
         )
         assert_bash_exec(
             bash,
-            '_comp__test_words_ifs() { local -a arr=(00) input=$2; _comp_compgen -F "$1" arr -W \'$input\' -- "${@:$#}"; _comp__test_dump; }',
+            '_comp__test_words_ifs() { local -a arr=(00); local input=$2; _comp_compgen -F "$1" arr -W \'$input\' -- "${@:$#}"; _comp__test_dump; }',
         )
 
     def test_1_basic(self, bash, functions):
