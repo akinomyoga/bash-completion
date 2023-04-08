@@ -410,7 +410,7 @@ _comp_split()
 _comp_compgen()
 {
     local _append=false IFS=$' \t\n'
-    local -a _split_options=()
+    local -a _split_options=(-l)
 
     local OPTIND=1 OPTARG="" OPTERR=0 _opt
     while getopts ':alF:' _opt "$@"; do
@@ -451,7 +451,7 @@ _comp_compgen()
         return "$_status"
     }
 
-    _comp_split "${_split_options[@]}" -l "$1" "$_result"
+    _comp_split "${_split_options[@]}" "$1" "$_result"
 }
 
 # Check if the argument looks like a path.
