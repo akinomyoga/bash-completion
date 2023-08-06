@@ -3415,18 +3415,18 @@ _comp_load__visit_file()
         if compspec=$(complete -p -- "$cmd" 2>/dev/null); then
             # $rawcmd contains the raw shell word before processing
             # backslash
-            [[ $rawcmd != "$cmd" ]] && eval "$compspec \"\$rawcmd\""
+            [[ $rawcmd != "$cmd" ]] && eval -- "$compspec \"\$rawcmd\""
             # If invoked without path, that one should be set, too
             # ...but let's not overwrite an existing one, if any
             [[ $origcmd != "$cmd" && $origcmd != "$rawcmd" ]] &&
                 ! complete -p -- "$origcmd" &>/dev/null &&
-                eval "$compspec \"\$origcmd\""
+                eval -- "$compspec \"\$origcmd\""
             return 0
         fi
         # If not, see if we got one for $cmdname
         if [[ $cmdname != "$cmd" ]] && compspec=$(complete -p -- "$cmdname" 2>/dev/null); then
             # Use that for $cmd too, if we have a full path to it
-            [[ $cmd == /* ]] && eval "$compspec \"\$cmd\""
+            [[ $cmd == /* ]] && eval -- "$compspec \"\$cmd\""
             return 0
         fi
         # Nothing expected was set, continue lookup
@@ -3458,7 +3458,7 @@ _comp_load()
     if [[ $rawcmd == \\* ]]; then
         origcmd=${rawcmd:1}
         # If we already have a completion for the "real" command, use it
-        $(complete -p -- "$origcmd" 2>/dev/null || echo false) "$rawcmd" && return 0
+        eval -- "$(complete -p -- "$origcmd" 2>/dev/null || echo false) \"\$rawcmd\"" && return 0
     fi
 
     local cmdname=${origcmd##*/}
