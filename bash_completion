@@ -3148,7 +3148,7 @@ _comp_load()
     if [[ $REPLY != "$cmd" ]]; then
         cmd=$REPLY
         # If we already have a completion for the "real" command, use it
-        $(complete -p -- "$cmd" 2>/dev/null || echo false) "$1" && return 0
+        eval -- "$(complete -p -- "$cmd" 2>/dev/null || echo false) \"\$1\"" && return 0
     fi
 
     # Resolve absolute path to $cmd
