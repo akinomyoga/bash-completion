@@ -15,21 +15,16 @@ _comp_cmd_dmypy()
             ;;
     esac
 
-    local cmd="" has_cmd="" i
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} != -* && ${words[i - 1]} != --status-file ]]; then
-            cmd=${words[i]}
-            has_cmd=set
-            break
-        fi
-    done
-
-    case ${cmd-} in
-        check | run)
-            _comp_compgen_filedir '@(py|pyi)'
-            return
-            ;;
-    esac
+    local REPLY has_cmd=""
+    if _comp_get_first_arg -a '--status-file'; then
+        has_cmd=set
+        case $REPLY in
+            check | run)
+                _comp_compgen_filedir '@(py|pyi)'
+                return
+                ;;
+        esac
+    fi
 
     if [[ $cur == -* ]]; then
         _comp_compgen_help

@@ -50,14 +50,9 @@ _comp_cmd_slackpkg()
     [[ -r $config ]] || return
     . "$config"
 
-    local i action
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} != -* ]]; then
-            action="${words[i]}"
-            break
-        fi
-    done
-
+    local REPLY
+    _comp_get_first_arg
+    local action=$REPLY
     case "$action" in
         generate-template | search | file-search)
             # argument required but no completions available

@@ -104,22 +104,10 @@ _comp_cmd_svcadm()
     _comp_initialize -n : -- "$@" || return
 
     local command_list="enable disable restart refresh clear mark milestone"
-    local command="" i
 
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == @(enable|disable|restart|refresh|clear|mark|milestone) ]]; then
-            command=${words[i]}
-            break
-        fi
-    done
-
-    if [[ ! $command ]]; then
-        if [[ ${cur} == -* ]]; then
-            _comp_compgen -- -W "-v"
-        else
-            _comp_compgen -- -W "$command_list"
-        fi
-    else
+    local REPLY
+    if _comp_get_first_arg -Ni "@(enable|disable|restart|refresh|clear|mark|milestone)"; then
+        local command=$REPLY
         if [[ ${cur} == -* ]]; then
             case "$command" in
                 enable)
@@ -143,6 +131,12 @@ _comp_cmd_svcadm()
             else
                 _comp_cmd_svcadm__fmri "${cur}" "svc:"
             fi
+        fi
+    else
+        if [[ ${cur} == -* ]]; then
+            _comp_compgen -- -W "-v"
+        else
+            _comp_compgen -- -W "$command_list"
         fi
     fi
 } &&

@@ -5,16 +5,9 @@ _comp_cmd_apt_build()
     local cur prev words cword comp_args
     _comp_initialize -- "$@" || return
 
-    local special="" i
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == @(install|remove|source|info|clean) ]]; then
-            special=${words[i]}
-            break
-        fi
-    done
-
-    if [[ $special ]]; then
-        case $special in
+    local REPLY
+    if _comp_get_first_arg -Ni "@(install|remove|source|info|clean)"; then
+        case $REPLY in
             install | source | info)
                 _comp_compgen -x apt-cache packages
                 ;;
