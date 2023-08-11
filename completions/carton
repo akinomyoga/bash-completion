@@ -18,29 +18,15 @@ _comp_cmd_carton()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local i command="" has_command=""
-    for ((i = 1; i < cword; i++)); do
-        case ${words[i]} in
-            -*) ;;
-            *)
-                command=${words[i]}
-                has_command=set
-                break
-                ;;
-        esac
-    done
-
-    if [[ ! $has_command ]]; then
+    local ret
+    if ! _comp_get_first_arg; then
         _comp_cmd_carton__commands "$1"
         return
     fi
+    local command=$ret
 
     case $prev in
-        --version | -v)
-            return
-            ;;
-        --help | -h)
-            [[ $has_command ]] || _comp_cmd_carton__commands "$1"
+        --version | --help | -[vh])
             return
             ;;
         --cpanfile)

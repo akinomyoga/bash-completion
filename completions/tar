@@ -411,7 +411,7 @@ __tar_extract_like_mode()
 
 _comp_cmd_tar__try_list_archive()
 {
-    local tarball="" tarbin untar i
+    local tarball="" tarbin untar
 
     __tar_extract_like_mode || return 1
 
@@ -419,18 +419,12 @@ _comp_cmd_tar__try_list_archive()
     # directory structure in tarball (for which the _comp_compgen_filedir is
     # unusable)
 
-    set -- "${words[@]}"
-    tarbin=$1
+    tarbin=${words[0]-}
     untar="tf"
-    shift
 
-    for i in "$@"; do
-        if [[ $i == *.$ext ]]; then
-            tarball=$i
-            break
-        fi
-    done
-    if [[ $tarball ]]; then
+    local ret
+    if _comp_get_first_arg -ANi "*.$ext"; then
+        tarball=$ret
         _comp_compgen -c "$(printf %q "$cur")" split -lo filenames -- "$(
             $tarbin $untar "$tarball" 2>/dev/null |
                 while read -r line; do

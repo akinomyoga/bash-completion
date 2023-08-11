@@ -12,15 +12,11 @@ _comp_cmd_pkg_config()
             return
             ;;
         --variable)
-            local word
-            for word in "${words[@]:1}"; do
-                if [[ $word != -* ]]; then
-                    _comp_compgen_split -- "$(
-                        "$1" "$word" --print-variables 2>/dev/null
-                    )"
-                    break
-                fi
-            done
+            local ret
+            _comp_get_first_arg -A &&
+                _comp_compgen_split -- "$(
+                    "$1" "$ret" --print-variables 2>/dev/null
+                )"
             return
             ;;
         -\? | --help | --version | --usage)

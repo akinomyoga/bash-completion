@@ -23,7 +23,7 @@ _comp_cmd_ktutil()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local command commands i options
+    local command commands options
 
     case $prev in
         -p | --principal)
@@ -53,19 +53,9 @@ _comp_cmd_ktutil()
     commands='add change copy get list remove rename purge srvconvert
         srv2keytab srvcreate key2srvtab'
 
-    for ((i = 1; i < cword; i++)); do
-        case ${words[i]} in
-            -k | --keytab)
-                ((i++))
-                ;;
-            -*) ;;
-
-            *)
-                command=${words[i]}
-                break
-                ;;
-        esac
-    done
+    local ret
+    _comp_get_first_arg -a '@(-k|--keytab)'
+    local command=$ret
 
     if [[ $cur == -* ]]; then
         case ${command-} in

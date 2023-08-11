@@ -11,13 +11,8 @@ _comp_cmd_valgrind()
         return 0
     fi
 
-    local word tool=""
-    for word in "${words[@]:1}"; do
-        if [[ $word == --tool=?* ]]; then
-            tool=$word
-            break
-        fi
-    done
+    _comp_get_first_arg -ANi "--tool=?*"
+    local tool=$ret
 
     case $prev in
         -h | --help | --help-debug | --version)
