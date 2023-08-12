@@ -18,22 +18,13 @@ _comp_cmd_carton()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local i command="" has_command=""
-    for ((i = 1; i < cword; i++)); do
-        case ${words[i]} in
-            -*) ;;
-            *)
-                command=${words[i]}
-                has_command=set
-                break
-                ;;
-        esac
-    done
-
-    if [[ ! $has_command ]]; then
+    local i command="" REPLY
+    if ! _comp_locate_first_arg; then
         _comp_cmd_carton__commands "$1"
         return
     fi
+    i=$REPLY
+    command=${words[i]}
 
     case $prev in
         --version | --help | -[vh])
@@ -71,7 +62,6 @@ _comp_cmd_carton()
         exec)
             # skip all the options --, -v, etc. and identify the command name
             # position.
-            local REPLY
             _comp_locate_first_arg -o "$((i + 1))" || REPLY=$cword
             _comp_command_offset "$REPLY"
             return
