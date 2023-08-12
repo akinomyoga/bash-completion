@@ -2178,10 +2178,143 @@ _comp_realcommand()
     fi
 }
 
+# This function parses arguments and extract information based on
+# ${FUNCNAME[1]}.  This function is intended to be internally called from
+# public interfaces:
+#
+# - _comp_locate_first_arg
+# - _comp_get_first_arg
+# - _comp_count_args
+#
+# The options this function accepts are described in the document comments of
+# `_comp_locate_first_arg`.
+#
+# @since 2.12
+_comp__parse_words()
+{
+    local has_exclude="" exclude=""
+    local offset=1 end="" restarg=set
+    local glob_optarg="" glob_include="" glob_exclude='-?*' glob_break=""
+
+    local _old_nocasematch=""
+    if shopt -q nocasematch; then
+        _old_nocasematch=set
+        shopt -u nocasematch
+    fi
+    local OPTIND=1 OPTARG="" OPTERR=0 _opt
+    while getopts ':n:Na:i:x:b:o:E:CA' _opt "$@"; do
+        case $_opt in
+            n) has_exclude=set exclude+=$OPTARG ;;
+            N) restarg="" glob_exclude="*" ;;
+            a) glob_optarg=$OPTARG ;;
+            i) glob_include=$OPTARG ;;
+            x) glob_exclude=$OPTARG ;;
+            b) glob_break=$OPTARG ;;
+            o) offset=$OPTARG ;;
+            E) end=$OPTARG ;;
+            [CA]) end=$((cword + 1)) ;;
+            *)
+                printf 'bash_completion: %s: usage error\n' "${FUNCNAME[1]}" >&2
+                return 2
+                ;;
+        esac
+    done
+    [[ $_old_nocasematch ]] && shopt -s nocasematch
+    shift "$((OPTIND - 1))"
+
+    case ${FUNCNAME[1]} in
+        _comp_count_args) local count=1 ;;
+    esac
+
+    if (($#)); then
+        printf 'bash_completion: %s: extra arguments.\n' "${FUNCNAME[1]}" >&2
+        return 2
+    fi
+
+    # reassemble cword and words if necessary
+    if [[ $has_exclude ]]; then
+        local cword words
+        _comp__reassemble_words "$exclude<>&" words cword
+    fi
+    case $end in
+        "") end=$cword ;;
+        C) end=$((cword + 1)) ;;
+        A) end=${#words[@]} ;;
+        *) ((end < 0)) && ((end += ${#words[@]})) ;;
+    esac
+
+    ret=
+    local i
+    for ((i = offset; i < end; i++)); do
+        # shellcheck disable=SC2053
+        if [[ $glob_break && ${words[i]} == $glob_break ]]; then
+            return 124
+        elif [[ $glob_optarg && ${words[i]} == $glob_optarg ]]; then
+            ((i++))
+        elif [[ ! ($glob_exclude && ${words[i]} == $glob_exclude) ||
+            $glob_include && ${words[i]} == $glob_include ]]; then
+            # process normal argument
+            case ${FUNCNAME[1]} in
+                _comp_locate_first_arg)
+                    ret=$i
+                    return 0
+                    ;;
+                _comp_get_first_arg)
+                    ret=${words[i]}
+                    return 0
+                    ;;
+                _comp_count_args)
+                    ((count++))
+                    ;;
+            esac
+        elif [[ $restarg && ${words[i]} == -- ]] && ((i + 1 < end)); then
+            # process rest arguments
+            case ${FUNCNAME[1]} in
+                _comp_locate_first_arg)
+                    ret=$((i + 1))
+                    return 0
+                    ;;
+                _comp_get_first_arg)
+                    ret=${words[i + 1]}
+                    return 0
+                    ;;
+                _comp_count_args)
+                    ((count += end - i - 1))
+                    ;;
+            esac
+            break
+        fi
+    done
+
+    case ${FUNCNAME[1]} in
+        _comp_count_args)
+            ret=$count
+            return 0
+            ;;
+        *) return 1 ;;
+    esac
+}
+
 # This function returns the position of the first argument, excluding options
 #
 # Options:
+#     -n CHARS Characters out of $COMP_WORDBREAKS which should NOT be
+#              considered word breaks. See _comp__reassemble_words.  This
+#              induces reassembling $cword and ${words[@]} from $COMP_COWRD and
+#              ${COMP_WORDS[@]}.
+#     -N       Disable `--` and do not accept anything by default (-x "*")
 #     -a GLOB  Pattern of options that take an option argument
+#     -i GLOB  Words that should be counted as args (default: <empty>)
+#     -x GLOB  Words that should not be counted as args (default: -?*)
+#     -b GLOB  Words that stops scanning arguments (default: <empty>).  If the
+#              scanning is stopped by this pattern, the function returns 124.
+#     -o INT   Offset to start scanning words (default: 1)
+#     -E INT   End point of the scan (default: cword).  If a negative value is
+#              specified, it is interpreted as the offset from ${#words[@]}.
+#     -C       Set end point of the scan to the end of the current
+#              word.  This is equivalent to `-E "$((cword + 1))"`
+#     -A       Process all the words after offset.  This is equivalent
+#              to `-E "${#words[@]}"`
 #
 # @var[out] ret Position of the first argument before the current one being
 # completed if any, or otherwise an empty string
@@ -2189,40 +2322,13 @@ _comp_realcommand()
 # @since 2.12
 _comp_locate_first_arg()
 {
-    local has_optarg=""
-    local OPTIND=1 OPTARG="" OPTERR=0 _opt
-    while getopts ':a:' _opt "$@"; do
-        case $_opt in
-            a) has_optarg=$OPTARG ;;
-            *)
-                echo "bash_completion: $FUNCNAME: usage error" >&2
-                return 2
-                ;;
-        esac
-    done
-    shift "$((OPTIND - 1))"
-
-    local i
-    ret=
-    for ((i = 1; i < cword; i++)); do
-        # shellcheck disable=SC2053
-        if [[ $has_optarg && ${words[i]} == $has_optarg ]]; then
-            ((i++))
-        elif [[ ${words[i]} != -?* ]]; then
-            ret=$i
-            return 0
-        elif [[ ${words[i]} == -- ]]; then
-            ((i + 1 < cword)) && ret=$((i + 1)) && return 0
-            break
-        fi
-    done
-    return 1
+    _comp__parse_words "$@"
 }
 
 # This function returns the first argument, excluding options
 #
-# Options:
-#     -a GLOB  Pattern of options that take an option argument
+# This function accepts the same options as `_comp_locate_first_arg`.
+# See `_comp_locate_first_arg`.
 #
 # @var[out] ret First argument before the current one being completed if any,
 # or otherwise an empty string
@@ -2230,55 +2336,20 @@ _comp_locate_first_arg()
 # @since 2.12
 _comp_get_first_arg()
 {
-    _comp_locate_first_arg "$@" && ret=${words[ret]}
+    _comp__parse_words "$@"
 }
 
 # This function counts the number of args, excluding options
 #
-# Options:
-#     -n CHARS  Characters out of $COMP_WORDBREAKS which should
-#               NOT be considered word breaks. See
-#               _comp__reassemble_words.
-#     -a GLOB   Options whose following argument should not be counted
-#     -i GLOB   Options that should be counted as args
+# This function accepts the same options as `_comp_locate_first_arg`.
+# See `_comp_locate_first_arg`.
 #
-# @var[out] ret    Return the number of arguments
+# @var[out] ret  Return the number of arguments.  The current word is always
+# counted.
 # @since 2.12
 _comp_count_args()
 {
-    local has_optarg="" has_exclude="" exclude="" glob_include=""
-    local OPTIND=1 OPTARG="" OPTERR=0 _opt
-    while getopts ':a:n:i:' _opt "$@"; do
-        case $_opt in
-            a) has_optarg=$OPTARG ;;
-            n) has_exclude=set exclude+=$OPTARG ;;
-            i) glob_include=$OPTARG ;;
-            *)
-                echo "bash_completion: $FUNCNAME: usage error" >&2
-                return 2
-                ;;
-        esac
-    done
-    shift "$((OPTIND - 1))"
-
-    if [[ $has_exclude ]]; then
-        local cword words
-        _comp__reassemble_words "$exclude<>&" words cword
-    fi
-
-    local i
-    ret=1
-    for ((i = 1; i < cword; i++)); do
-        # shellcheck disable=SC2053
-        if [[ $has_optarg && ${words[i]} == $has_optarg ]]; then
-            ((i++))
-        elif [[ ${words[i]} != -?* || $glob_include && ${words[i]} == $glob_include ]]; then
-            ((ret++))
-        elif [[ ${words[i]} == -- ]]; then
-            ((ret += cword - i - 1))
-            break
-        fi
-    done
+    _comp__parse_words "$@"
 }
 
 # This function completes on PCI IDs
