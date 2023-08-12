@@ -6,12 +6,11 @@ _comp_cmd_gdb()
     _comp_initialize -- "$@" || return
 
     # gdb [options] --args executable-file [inferior-arguments ...]
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == --args ]]; then
-            _comp_command_offset $((i + 1))
-            return $?
-        fi
-    done
+    local ret
+    if _comp_locate_first_arg -Ni "--args"; then
+        _comp_command_offset "$((ret + 1))"
+        return "$?"
+    fi
 
     # gdb [options] [executable-file [core-file or process-id]]
     if ((cword == 1)); then

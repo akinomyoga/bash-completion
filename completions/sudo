@@ -5,27 +5,21 @@ _comp_cmd_sudo()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local i mode=normal
+    local mode=normal
     [[ $1 == *sudoedit ]] && mode=edit
 
     local noargopts='!(-*|*[uUgCp]*)'
-    [[ $mode == normal ]] &&
-        for ((i = 1; i <= cword; i++)); do
-            if [[ ${words[i]} != -* ]]; then
-                local PATH=$PATH:/sbin:/usr/sbin:/usr/local/sbin
-                local _comp_root_command=$1
-                _comp_command_offset $i
-                return
-            fi
-            # shellcheck disable=SC2254
-            if [[ ${words[i]} == -@(${noargopts}e*|-edit) ]]; then
-                mode=edit
-                break
-            fi
-            # shellcheck disable=SC2254
-            [[ ${words[i]} == @(--@(user|other-user|group|close-from|prompt)|-${noargopts}[uUgCp]) ]] &&
-                ((i++))
-        done
+    if [[ $mode == normal ]]; then
+        local ret
+        if _comp_locate_first_arg -Cx "-*" -b "-@(${noargopts}e*|-edit)" -a "@(--@(user|other-user|group|close-from|prompt)|-${noargopts}[uUgCp])"; then
+            local PATH=$PATH:/sbin:/usr/sbin:/usr/local/sbin
+            local _comp_root_command=$1
+            _comp_command_offset "$ret"
+            return
+        elif (($? == 124)); then
+            mode=edit
+        fi
+    fi
 
     # shellcheck disable=SC2254
     case "$prev" in

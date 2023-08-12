@@ -5,16 +5,14 @@ _comp_cmd_ccache()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local i
-    for ((i = 1; i <= cword; i++)); do
-        if [[ ${words[i]} != -* ]]; then
-            _comp_command_offset $i
-            return
-        fi
-        [[ ${words[i]} == -*[oFM] ]] && ((i++))
-    done
-
     local noargopts='!(-*|*[FMo]*)'
+
+    local ret
+    if _comp_locate_first_arg -Cx "-*" -a "-${noargopts}[oFM]"; then
+        _comp_command_offset "$ret"
+        return
+    fi
+
     # shellcheck disable=SC2254
     case $prev in
         --help | --version | --max-files | --max-size | -${noargopts}[hVFM])

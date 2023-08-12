@@ -63,21 +63,11 @@ _comp_cmd_screen__sessions()
             esac
         fi
 
-        local i
-        for ((i = 1; i <= cword; i++)); do
-            case ${words[i]} in
-                -*[rRdDxscTehpSt])
-                    ((i++))
-                    continue
-                    ;;
-                -*)
-                    continue
-                    ;;
-            esac
-
-            _comp_command_offset $i
+        local ret
+        if _comp_locate_first_arg -Cx "-*" -a "-*[rRdDxscTehpSt]"; then
+            _comp_command_offset "$ret"
             return
-        done
+        fi
 
         case $prev in
             -*[rR])

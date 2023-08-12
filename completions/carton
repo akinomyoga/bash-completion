@@ -75,19 +75,9 @@ _comp_cmd_carton()
         exec)
             # skip all the options --, -v, etc. and identify the command name
             # position.
-            local i
-            for ((i++; i < cword; i++)); do
-                case ${words[i]} in
-                    --)
-                        ((i++))
-                        break
-                        ;;
-                    -*) ;;
-                    *) break ;;
-                esac
-            done
-
-            _comp_command_offset "$i"
+            local ret
+            _comp_locate_first_arg || ret=$cword
+            _comp_command_offset "$ret"
             return
             ;;
         show | update)
