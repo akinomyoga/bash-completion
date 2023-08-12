@@ -2,18 +2,13 @@
 
 _comp_cmd_quota__user_or_group()
 {
-    local i
-
-    # complete on groups if -g was given
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == -@(g|-group) ]]; then
-            _comp_compgen -- -g
-            return
-        fi
-    done
-
-    # otherwise complete on users
-    _comp_compgen -- -u
+    if _comp_has_arg -Ni "-@(g|-group)"; then
+        # complete on groups if -g was given
+        _comp_compgen -- -g
+    else
+        # otherwise complete on users
+        _comp_compgen -- -u
+    fi
 }
 
 _comp_cmd_quota__parse_help()

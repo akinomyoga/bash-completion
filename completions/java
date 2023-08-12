@@ -140,23 +140,11 @@ _comp_cmd_java()
     local cur prev words cword comp_args
     _comp_initialize -n : -- "$@" || return
 
-    local i
-
-    for ((i = 1; i < cword; i++)); do
-        case ${words[i]} in
-            -cp | -classpath)
-                ((i++)) # skip the classpath string.
-                ;;
-            -*)
-                # this is an option, not a class/jarfile name.
-                ;;
-            *)
-                # once we've seen a class, just do filename completion
-                _comp_compgen_filedir
-                return
-                ;;
-        esac
-    done
+    if _comp_has_arg -a '@(-cp|-classpath)'; then
+        # once we've seen a class, just do filename completion
+        _comp_compgen_filedir
+        return
+    fi
 
     case $cur in
         # standard option completions
