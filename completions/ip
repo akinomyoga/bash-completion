@@ -42,16 +42,9 @@ _comp_cmd_ip()
             ;;
     esac
 
-    local subcword cmd="" has_cmd="" subcmd=""
-    for ((subcword = 1; subcword < cword; subcword++)); do
-        [[ ${words[subcword]} == -b?(atch) ]] && return
-        [[ $has_cmd ]] && subcmd=${words[subcword]} && break
-        [[ ${words[subcword]} != -* &&
-            ${words[subcword - 1]} != -@(f?(amily)|rc?(vbuf)) ]] &&
-            cmd=${words[subcword]} has_cmd=set
-    done
-
-    if [[ ! $has_cmd ]]; then
+    local ret
+    if ! _comp_locate_first_arg -b "-b?(atch)" -a "-@(f?(amily)|rc?(vbuf))"; then
+        (($? == 124)) && return
         case $cur in
             -*)
                 _comp_compgen -a help - <<<"$(
@@ -76,6 +69,11 @@ _comp_cmd_ip()
                 ;;
         esac
         return
+    fi
+
+    local subcword=$ret cmd=${words[ret]} subcmd=""
+    if ((++subcword < cword)); then
+        subcmd=${words[subcword]}
     fi
 
     [[ $subcmd == help ]] && return
