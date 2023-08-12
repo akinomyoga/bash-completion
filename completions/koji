@@ -213,13 +213,11 @@ _comp_cmd_koji()
             wait-repo)
                 case $nth in
                     1)
-                        for ((i = commandix + 1; i < cword; i++)); do
-                            if [[ ${words[i]} == --target ]]; then
-                                _comp_cmd_koji__target "$1"
-                                return
-                            fi
-                        done
-                        _comp_cmd_koji__tag "$1"
+                        if _comp_has_arg -o "$((commandix + 1))" -Ni "--target"; then
+                            _comp_cmd_koji__target "$1"
+                        else
+                            _comp_cmd_koji__tag "$1"
+                        fi
                         ;;
                 esac
                 ;;
