@@ -7,13 +7,11 @@ _comp_cmd_find()
     local cur prev words cword comp_args
     _comp_initialize -- "$@" || return
 
-    local i
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == -@(exec|ok)?(dir) ]]; then
-            _comp_command_offset $((i + 1))
-            return
-        fi
-    done
+    local REPLY
+    if _comp_locate_first_arg -Ni "-@(exec|ok)?(dir)"; then
+        _comp_command_offset "$((REPLY + 1))"
+        return
+    fi
 
     case $prev in
         -maxdepth | -mindepth)
