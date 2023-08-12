@@ -5,13 +5,11 @@ _comp_cmd_valgrind()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local i
-    for ((i = 1; i <= cword; i++)); do
-        if [[ ${words[i]} != @([-=])* ]]; then
-            _comp_command_offset $i
-            return
-        fi
-    done
+    local REPLY
+    if _comp_locate_first_arg -Cx "@([-=])*"; then
+        _comp_command_offset "$REPLY"
+        return 0
+    fi
 
     local word tool=""
     for word in "${words[@]:1}"; do
