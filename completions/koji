@@ -36,14 +36,10 @@ _comp_cmd_koji()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local commandix command="" has_command=""
-    for ((commandix = 1; commandix < cword; commandix++)); do
-        if [[ ${words[commandix]} != -* ]]; then
-            command=${words[commandix]}
-            has_command=set
-            break
-        fi
-    done
+    local REPLY
+    _comp_locate_first_arg
+    local commandix=$REPLY command="" has_command=${REPLY:+set}
+    [[ $commandix ]] && command=${words[commandix]}
 
     local noargopts='!(-*|*[co]*)'
     # shellcheck disable=SC2254

@@ -31,16 +31,13 @@ _comp_cmd_update_alternatives()
             ;;
     esac
 
-    local mode="" args i
+    local mode="" args REPLY
 
     # find which mode to use and how many real args used so far
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == --@(install|remove|auto|display|config|remove-all|set) ]]; then
-            mode=${words[i]}
-            args=$((cword - i))
-            break
-        fi
-    done
+    if _comp_locate_first_arg -Ni "--@(install|remove|auto|display|config|remove-all|set)"; then
+        mode=${words[REPLY]}
+        args=$((cword - REPLY))
+    fi
 
     case ${mode-} in
         --install)

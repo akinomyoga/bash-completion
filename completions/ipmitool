@@ -64,18 +64,18 @@ _comp_cmd_ipmitool()
     local cmds=(raw i2c spd lan chassis power event mc sdr sensor fru gendev
         sel pef sol tsol isol user channel session sunoem kontronoem picmg fwum
         firewall shell exec set hpm ekanalyzer)
-    local i c cmd="" has_cmd="" subcmd
-    for ((i = 1; i < cword; i++)); do
-        [[ $has_cmd ]] && subcmd=${words[i]} && break
-        for c in "${cmds[@]}"; do
-            [[ ${words[i]} == "$c" ]] && cmd=$c has_cmd=set && break
-        done
-    done
+    local IFS='|'
+    local glob_cmds="@(${cmds[*]})"
+    _comp_unlocal IFS
 
-    if [[ ! $has_cmd ]]; then
+    local REPLY
+    if ! _comp_locate_first_arg -Ni "$glob_cmds"; then
         _comp_compgen -- -W '"${cmds[@]}"'
         return
     fi
+
+    local cmd=${words[REPLY]} subcmd=""
+    ((REPLY + 1 < cword)) && subcmd=${words[REPLY + 1]}
 
     # Command/subcommand completions
 
