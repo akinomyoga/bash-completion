@@ -2182,6 +2182,7 @@ _comp_realcommand()
 # ${FUNCNAME[1]}.  This function is intended to be internally called from
 # public interfaces:
 #
+# - _comp_has_arg
 # - _comp_locate_first_arg
 # - _comp_get_first_arg
 # - _comp_count_args
@@ -2223,6 +2224,7 @@ _comp__parse_words()
     shift "$((OPTIND - 1))"
 
     case ${FUNCNAME[1]} in
+        _comp_has_arg) local ret ;;
         _comp_count_args) local count=1 ;;
     esac
 
@@ -2255,6 +2257,9 @@ _comp__parse_words()
             $glob_include && ${words[i]} == $glob_include ]]; then
             # process normal argument
             case ${FUNCNAME[1]} in
+                _comp_has_arg)
+                    return 0
+                    ;;
                 _comp_locate_first_arg)
                     ret=$i
                     return 0
@@ -2270,6 +2275,9 @@ _comp__parse_words()
         elif [[ $restarg && ${words[i]} == -- ]] && ((i + 1 < end)); then
             # process rest arguments
             case ${FUNCNAME[1]} in
+                _comp_has_arg)
+                    return 0
+                    ;;
                 _comp_locate_first_arg)
                     ret=$((i + 1))
                     return 0
@@ -2295,7 +2303,7 @@ _comp__parse_words()
     esac
 }
 
-# This function returns the position of the first argument, excluding options
+# Test if there is at least one argument satisfying the condition.
 #
 # Options:
 #     -n CHARS Characters out of $COMP_WORDBREAKS which should NOT be
@@ -2316,6 +2324,18 @@ _comp__parse_words()
 #     -A       Process all the words after offset.  This is equivalent
 #              to `-E "${#words[@]}"`
 #
+# @return True (0) if any argument is found, False (> 0) otherwise.
+# @since 2.12
+_comp_has_arg()
+{
+    _comp__parse_words "$@"
+}
+
+# This function returns the position of the first argument, excluding options
+#
+# This function accepts the same options as `_comp_has_arg`.
+# See `_comp_has_arg`.
+#
 # @var[out] ret Position of the first argument before the current one being
 # completed if any, or otherwise an empty string
 # @return True (0) if any argument is found, False (> 0) otherwise.
@@ -2325,10 +2345,10 @@ _comp_locate_first_arg()
     _comp__parse_words "$@"
 }
 
-# This function returns the first argument, excluding options
+# This function returns the first argument, excluding options.
 #
-# This function accepts the same options as `_comp_locate_first_arg`.
-# See `_comp_locate_first_arg`.
+# This function accepts the same options as `_comp_has_arg`.
+# See `_comp_has_arg`.
 #
 # @var[out] ret First argument before the current one being completed if any,
 # or otherwise an empty string
@@ -2341,8 +2361,8 @@ _comp_get_first_arg()
 
 # This function counts the number of args, excluding options
 #
-# This function accepts the same options as `_comp_locate_first_arg`.
-# See `_comp_locate_first_arg`.
+# This function accepts the same options as `_comp_has_arg`.
+# See `_comp_has_arg`.
 #
 # @var[out] ret  Return the number of arguments.  The current word is always
 # counted.
