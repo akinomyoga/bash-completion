@@ -2186,6 +2186,7 @@ _comp_realcommand()
 # - _comp_locate_first_arg
 # - _comp_get_first_arg
 # - _comp_count_args
+# - _comp_get_option_arg
 #
 # The options this function accepts are described in the document comments of
 # `_comp_locate_first_arg`.
@@ -2223,9 +2224,21 @@ _comp__parse_words()
     [[ $_old_nocasematch ]] && shopt -s nocasematch
     shift "$((OPTIND - 1))"
 
+    local target_optarg=""
     case ${FUNCNAME[1]} in
         _comp_has_arg) local ret ;;
         _comp_count_args) local count=1 ;;
+        _comp_get_option_arg)
+            if (($# == 0)); then
+                printf 'bash_completion: %s: no option pattern is specified.\n' "${FUNCNAME[1]}" >&2
+                return 2
+            elif [[ ! $1 ]]; then
+                printf 'bash_completion: %s: option pattern is empty.\n' "${FUNCNAME[1]}" >&2
+                return 2
+            fi
+            target_optarg=$1
+            shift
+            ;;
     esac
 
     if (($#)); then
@@ -2251,6 +2264,20 @@ _comp__parse_words()
         # shellcheck disable=SC2053
         if [[ $glob_break && ${words[i]} == $glob_break ]]; then
             return 124
+        elif [[ $target_optarg && ${words[i]%%=*} == $target_optarg ]]; then
+            # extract an option argument
+            if [[ ${words[i]} == *=* ]]; then
+                ret=${words[i]#*=}
+                return 0
+            elif ((i + 1 < end)); then
+                ret=${words[i + 1]}
+                return 0
+            fi
+        elif [[ $target_optarg && ${words[i]} != --* && ${words[i]} == $target_optarg?* ]]; then
+            # extract an option argument specified in the same word
+            # (e.g. -mModule).  This applies to only short options.
+            ret=${words[i]#$target_optarg}
+            return 0
         elif [[ $glob_optarg && ${words[i]} == $glob_optarg ]]; then
             ((i++))
         elif [[ ! ($glob_exclude && ${words[i]} == $glob_exclude) ||
@@ -2368,6 +2395,21 @@ _comp_get_first_arg()
 # counted.
 # @since 2.12
 _comp_count_args()
+{
+    _comp__parse_words "$@"
+}
+
+# This function returns an option argument of specified options
+#
+# This function accepts the same options as `_comp_has_arg`.
+# See `_comp_has_arg`.
+#
+# @param $1  Pattern of the options that take the option argument.
+#
+# @var[out] ret Option argument if any, or otherwise an empty string
+# @return True (0) if any option argument is found, False (> 0) otherwise.
+# @since 2.12
+_comp_get_option_arg()
 {
     _comp__parse_words "$@"
 }
