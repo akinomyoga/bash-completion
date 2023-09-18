@@ -75,6 +75,7 @@ _comp_cmd_carton()
         exec)
             # skip all the options --, -v, etc. and identify the command name
             # position.
+            local i
             for ((i++; i < cword; i++)); do
                 case ${words[i]} in
                     --)
