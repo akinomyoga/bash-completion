@@ -7,12 +7,8 @@ _comp_cmd_update_alternatives__installed()
     for i in alternatives dpkg/alternatives rpm/alternatives; do
         [[ -d /var/lib/$i ]] && admindir=/var/lib/$i && break
     done
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == --admindir ]]; then
-            admindir=${words[i + 1]}
-            break
-        fi
-    done
+    local REPLY
+    _comp_get_option_arg -- "--admindir" && admindir=$REPLY
     [[ -d $admindir ]] && _comp_compgen_split -- "$(command ls "$admindir")"
 }
 

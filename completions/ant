@@ -68,15 +68,11 @@ _comp_cmd_ant()
     else
         # available targets completion
         # find which buildfile to use
-        local buildfile=build.xml i
-        for ((i = 1; i < cword; i++)); do
-            if [[ ${words[i]} == -@(?(build)file|f) ]]; then
-                buildfile=${words[i + 1]}
-                break
-            fi
-        done
-        if ((i == cword)); then
-            local IFS=$' \t\n'
+        local buildfile=build.xml REPLY
+        if _comp_get_option_arg -- "-@(?(build)file|f)"; then
+            buildfile=$REPLY
+        else
+            local IFS=$' \t\n' i
             for i in ${ANT_ARGS-}; do
                 if [[ $prev == -@(?(build)file|f) ]]; then
                     buildfile=$i

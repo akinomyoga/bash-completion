@@ -262,21 +262,9 @@ _ssh_suboption_check()
 # @var[out] configfile   Found configfile, if any
 _comp_cmd_ssh__configfile()
 {
-    configfile=""
-    set -- "${words[@]}"
-    while (($# > 0)); do
-        if [[ $1 == -F* ]]; then
-            local REPLY
-            if ((${#1} > 2)); then
-                _comp_dequote "${1:2}" && configfile=$REPLY
-            else
-                shift
-                [[ ${1-} ]] && _comp_dequote "$1" && configfile=$REPLY
-            fi
-            break
-        fi
-        shift
-    done
+    local REPLY
+    _comp_get_option_arg -A -- "-F" && _comp_dequote "$REPLY"
+    configfile=$REPLY
 }
 
 # With $1 set, look for public key files, else private

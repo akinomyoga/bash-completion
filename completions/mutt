@@ -16,23 +16,9 @@ _comp_cmd_mutt__addresses()
 # @var[out] REPLY  muttrc filename
 _comp_cmd_mutt__get_muttrc()
 {
-    REPLY=
-    # Search COMP_WORDS for '-F muttrc' or '-Fmuttrc' argument
-    set -- "${words[@]}"
-    while (($# > 0)); do
-        if [[ $1 == -F* ]]; then
-            if ((${#1} > 2)); then
-                _comp_dequote "${1:2}"
-            else
-                shift
-                [[ ${1-} ]] && _comp_dequote "$1"
-            fi
-            break
-        fi
-        shift
-    done
-
-    if [[ ! $REPLY ]]; then
+    if ! {
+        _comp_get_option_arg -A -- "-F" && _comp_dequote "$REPLY" && [[ $REPLY ]]
+    }; then
         if [[ -f ~/.${muttcmd}rc ]]; then
             REPLY=\~/.${muttcmd}rc
         elif [[ -f ~/.${muttcmd}/${muttcmd}rc ]]; then

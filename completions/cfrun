@@ -21,13 +21,8 @@ _comp_cmd_cfrun()
             if [[ $cur == -* ]]; then
                 _comp_compgen -- -W '-f -h -d -S -T -v'
             else
-                local i hostfile=${CFINPUTS:-/var/lib/cfengine/inputs}/cfrun.hosts
-                for ((i = 1; i < cword; i++)); do
-                    if [[ ${words[i]} == -f ]]; then
-                        hostfile=${words[i + 1]}
-                        break
-                    fi
-                done
+                local REPLY hostfile=${CFINPUTS:-/var/lib/cfengine/inputs}/cfrun.hosts
+                _comp_get_option_arg -- "-f" && hostfile=$REPLY
                 [[ ! -f $hostfile ]] && return
 
                 _comp_compgen_split -- "$(command grep -v -E '(=|^$|^#)' \
