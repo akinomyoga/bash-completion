@@ -337,9 +337,9 @@ _parse_help()
         _comp_split opt "${2:---help}"
         args=(-c "$REPLY" ${opt[@]+"${opt[@]}"})
     fi
-    local -a REPLY=()
-    _comp_compgen -Rv REPLY help "${args[@]}" || return 1
-    ((${#REPLY[@]})) && printf '%s\n' "${REPLY[@]}"
+    local -a options=()
+    _comp_compgen -Rv options help "${args[@]}" || return 1
+    ((${#options[@]})) && printf '%s\n' "${options[@]}"
     return 0
 }
 
@@ -361,9 +361,9 @@ _parse_usage()
         _comp_split opt "${2:---usage}"
         args=(-c "$REPLY" ${opt[@]+"${opt[@]}"})
     fi
-    local -a REPLY=()
-    _comp_compgen -Rv REPLY usage "${args[@]}" || return 1
-    ((${#REPLY[@]})) && printf '%s\n' "${REPLY[@]}"
+    local -a options=()
+    _comp_compgen -Rv options usage "${args[@]}" || return 1
+    ((${#options[@]})) && printf '%s\n' "${options[@]}"
     return 0
 }
 
