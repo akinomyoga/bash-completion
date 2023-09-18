@@ -21,10 +21,8 @@ _comp_cmd_chown()
 
     if [[ $cur == -* ]]; then
         # Complete -options
-        local w opts=""
-        for w in "${words[@]}"; do
-            [[ $w == -@(R|-recursive) ]] && opts="-H -L -P" && break
-        done
+        local opts=""
+        _comp_has_arg -ANi "-@(R|-recursive)" && opts="-H -L -P"
         _comp_compgen -- -W '-c -h -f -R -v --changes --dereference
             --no-dereference --from --silent --quiet --reference --recursive
             --verbose --help --version $opts'

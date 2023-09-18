@@ -58,10 +58,7 @@ _comp_cmd_jq()
         return
     fi
 
-    local word
-    for word in "${words[@]}"; do
-        [[ $word != --?(json)args ]] || return
-    done
+    _comp_has_arg -ANi "--?(json)args" && return
 
     local REPLY
     # TODO: DTRT with args taking 2 options

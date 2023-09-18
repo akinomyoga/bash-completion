@@ -13,14 +13,10 @@ _comp_cmd_route()
     fi
 
     # Remove already given options from completions
-    local opt found i
+    local opt
     for opt in add del -host -net netmask metric mss window irtt reject mod \
         dyn reinstate dev default gw; do
-        found=""
-        for ((i = 1; i < cword; i++)); do
-            [[ ${words[i]} == "$opt" ]] && found=set && break
-        done
-        [[ $found ]] || COMPREPLY+=("$opt")
+        _comp_has_arg -Ni "$opt" || COMPREPLY+=("$opt")
     done
 
     ((${#COMPREPLY[@]})) &&

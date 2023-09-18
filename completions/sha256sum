@@ -21,13 +21,10 @@ _comp_cmd_sha256sum()
     local sumtype=${1##*/}
     sumtype=${sumtype%sum}
 
-    local opt
-    for opt in "${words[@]}"; do
-        if [[ $opt == -@(c|-check) ]]; then
-            _comp_compgen_filedir "$sumtype"
-            return
-        fi
-    done
+    if _comp_has_arg -ANi "-@(c|-check)"; then
+        _comp_compgen_filedir "$sumtype"
+        return
+    fi
 
     local files
     _comp_compgen -v files filedir &&
