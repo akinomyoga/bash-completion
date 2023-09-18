@@ -9,17 +9,8 @@ _comp_cmd_mock()
     _comp_initialize -s -- "$@" || return
 
     local plugins='tmpfs root_cache yum_cache bind_mount ccache'
-    local cfgdir=/etc/mock count=0 i
-
-    for i in "${words[@]}"; do
-        ((count == cword)) && break
-        if [[ $i == --configdir ]]; then
-            cfgdir="${words[count + 1]}"
-        elif [[ $i == --configdir=* ]]; then
-            cfgdir=${i/*=/}
-        fi
-        ((count++))
-    done
+    local cfgdir=/etc/mock REPLY
+    _comp_get_option_arg -- "--configdir" && cfgdir=$REPLY
 
     case $prev in
         -h | --help | --copyin | --copyout | --arch | -D | --define | --with | --without | \

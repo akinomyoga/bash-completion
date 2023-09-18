@@ -33,13 +33,9 @@ _comp_cmd_mdadm__raid_level()
 
 _comp_cmd_mdadm__raid_layout()
 {
-    local i level=""
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == -@(l|-level) ]]; then
-            level=${words[i + 1]}
-            break
-        fi
-    done
+    local REPLY
+    _comp_get_option_arg -- "-@(l|-level)"
+    local level=$REPLY
 
     case $level in
         raid5)

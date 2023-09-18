@@ -11,17 +11,10 @@ _comp_cmd_java__classpath()
 # @return 0 if at least one element is generated, or otherwise 1
 _comp_cmd_java__find_classpath()
 {
-    local i
-
     REPLY=
 
     # search first in current options
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == -@(cp|classpath) ]]; then
-            REPLY=${words[i + 1]}
-            break
-        fi
-    done
+    _comp_get_option_arg -- "-@(cp|classpath)"
 
     # fall back to environment, followed by current directory
     _comp_split -F : REPLY "${REPLY:-${CLASSPATH:-.}}"
@@ -32,17 +25,10 @@ _comp_cmd_java__find_classpath()
 # @return 0 if at least one element is generated, or otherwise 1
 _comp_cmd_java__find_sourcepath()
 {
-    local i
-
     REPLY=
 
     # search first in current options
-    for ((i = 1; i < cword; i++)); do
-        if [[ ${words[i]} == -sourcepath ]]; then
-            REPLY=${words[i + 1]}
-            break
-        fi
-    done
+    _comp_get_option_arg -- "-sourcepath"
 
     # fall back to classpath
     if [[ ! $REPLY ]]; then

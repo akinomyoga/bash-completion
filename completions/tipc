@@ -18,17 +18,14 @@ _comp_cmd_tipc__media()
 _comp_cmd_tipc__bearer()
 {
     local optind=$1
-    local media="" i
 
     if _comp_cmd_tipc__media "$optind"; then
         return
     fi
 
-    for ((i = 0; i < cword; i++)); do
-        if [[ ${words[i]} == 'media' ]]; then
-            media=${words[i + 1]}
-        fi
-    done
+    local REPLY
+    _comp_get_option_arg "media"
+    local media=$REPLY
 
     if ((cword == optind + 2)); then
         case "$media" in
@@ -109,7 +106,7 @@ _comp_cmd_tipc()
 
             case "${words[optind]}" in
                 enable)
-                    local media="" params
+                    local params
                     ((optind++))
 
                     if ((cword < optind + 4)); then
@@ -117,11 +114,9 @@ _comp_cmd_tipc()
                         return
                     fi
 
-                    for ((i = 0; i < cword; i++)); do
-                        if [[ ${words[i]} == 'media' ]]; then
-                            media=${words[i + 1]}
-                        fi
-                    done
+                    local REPLY
+                    _comp_get_option_arg "media"
+                    local media=$REPLY
                     case "$media" in
                         "udp")
                             local -a params=("localip" "localport" "remoteip"
