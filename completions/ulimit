@@ -21,10 +21,7 @@ _comp_cmd_ulimit()
     esac
 
     if [[ ! $mode ]]; then
-        local word
-        for word in "${words[@]}"; do
-            [[ $word == -*a* ]] && return
-        done
+        _comp_has_arg -ANi "-*a*" && return
 
         if [[ $cur == -* ]]; then
             _comp_compgen_usage -c help -s "$1"

@@ -26,14 +26,9 @@ _comp_cmd_avahi_browse()
 
     # Complete service types except with -a/-D/-b
     [[ $1 != *-domains ]] || return
-    local word
-    for word in "${words[@]}"; do
-        case $word in
-            --all | --browse-domains | --dump-db | -${noargopts}[aDb]*)
-                return
-                ;;
-        esac
-    done
+
+    _comp_has_arg -ANi "@(--all|--browse-domains|--dump-db|-${noargopts}[aDb]*)" &&
+        return
     _comp_compgen_split -- "$("$1" --dump-db --no-db-lookup)"
 
 } &&

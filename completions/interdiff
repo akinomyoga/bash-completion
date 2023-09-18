@@ -21,13 +21,8 @@ _comp_cmd_interdiff()
         return
     fi
 
-    local exts='@(?(d)patch|dif?(f))' word
-    for word in "${words[@]}"; do
-        if [[ $word == -@(z|-decompress) ]]; then
-            exts+='?(.@(gz|bz2))'
-            break
-        fi
-    done
+    local exts='@(?(d)patch|dif?(f))'
+    _comp_has_arg -ANi "-@(z|-decompress)" && exts+='?(.@(gz|bz2))'
     _comp_compgen_filedir "$exts"
 } &&
     complete -F _comp_cmd_interdiff interdiff
