@@ -17,11 +17,7 @@ _comp_cmd_postcat()
         return
     fi
 
-    local idx qfile=""
-    for idx in "${words[@]}"; do
-        [[ $idx == -q ]] && qfile=set && break
-    done
-    if [[ $qfile ]]; then
+    if _comp_has_arg -ANi "-q"; then
         local len=${#cur} pval
         for pval in $(mailq 2>/dev/null |
             command sed -e '1d; $d; /^[^0-9A-Z]/d; /^$/d; s/[* !].*$//'); do

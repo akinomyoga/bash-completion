@@ -61,14 +61,9 @@ _comp_cmd_find()
             ;;
     esac
 
-    local i exprfound=""
-    # set exprfound to true if there is already an expression present
-    for i in "${words[@]}"; do
-        [[ $i == [-\(\),\!]* ]] && exprfound=set && break
-    done
-
+    # If no expression (starting with [-(),!]) is present,
     # handle case where first parameter is not a dash option
-    if [[ ! $exprfound && $cur != [-\(\),\!]* ]]; then
+    if ! _comp_has_arg -ANi '[-(),!]*' && [[ $cur != [-\(\),\!]* ]]; then
         _comp_compgen_filedir -d
         return
     fi
@@ -93,7 +88,7 @@ _comp_cmd_find()
             [-ignore_readdir_race]=1 [-maxdepth]=1 [-mindepth]=1 [-mount]=1
             [-noignore_readdir_race]=1 [-noleaf]=1 [-nowarn]=1 [-regextype]=1
             [-version]=1 [-warn]=1 [-xdev]=1)
-        local j
+        local i j
         for i in "${words[@]}"; do
             [[ $i && -v onlyonce["$i"] ]] || continue
             for j in "${!COMPREPLY[@]}"; do
