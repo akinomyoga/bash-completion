@@ -5,12 +5,9 @@ _comp_cmd_openssl__compgen_sections()
     local config="" _i _file
 
     # check if a specific configuration file is used
-    for ((_i = 2; _i < cword; _i++)); do
-        if [[ ${words[_i]} == -config ]]; then
-            config=${words[_i + 1]}
-            break
-        fi
-    done
+    local ret
+    _comp_get_option_arg -o 2 -- "-config" && config=$ret
+    _comp_unlocal ret
 
     # if no config given, check some usual default locations
     if [[ ! $config ]]; then

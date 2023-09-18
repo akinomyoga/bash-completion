@@ -101,15 +101,12 @@ _comp_cmd_sysbench()
     esac
 
     # find out which test we're running
-    local i test="" has_test=""
-    for ((i = 1; i < ${#words[@]} - 1; i++)); do
-        # TODO --test= is deprecated, bare test name preferred
-        if [[ ${words[i]} == --test=* ]]; then
-            test=${words[i]#*=}
-            has_test=set
-            break
-        fi
-    done
+    # TODO --test= is deprecated, bare test name preferred
+    local ret test="" has_test=""
+    if _comp_get_option_arg -- "--test"; then
+        test=$ret
+        has_test=set
+    fi
 
     local opts
     _comp_compgen -v opts help

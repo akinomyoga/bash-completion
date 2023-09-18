@@ -143,7 +143,7 @@ _comp_cmd_make()
     local cur prev words cword was_split comp_args
     _comp_initialize -s -- "$@" || return
 
-    local makef makef_dir=("-C" ".") i
+    local makef makef_dir=("-C" ".")
 
     local noargopts='!(-*|*[foWICmEDVxj]*)'
     # shellcheck disable=SC2254
@@ -186,29 +186,18 @@ _comp_cmd_make()
     else
         # before we check for makefiles, see if a path was specified
         # with -C/--directory
-        for ((i = 1; i < ${#words[@]}; i++)); do
-            if [[ ${words[i]} == -@(C|-directory) ]]; then
-                # Expand tilde expansion
-                local ret
-                _comp_dequote "${words[i + 1]-}" &&
-                    [[ -d ${ret-} ]] &&
-                    makef_dir=(-C "$ret")
-                break
-            fi
-        done
+        local ret
+        _comp_get_option_arg -A -- "-@(C|-directory)" &&
+            _comp_dequote "$ret" &&
+            [[ -d $ret ]] &&
+            makef_dir=(-C "$ret")
 
         # before we scan for targets, see if a Makefile name was
         # specified with -f/--file/--makefile
-        for ((i = 1; i < ${#words[@]}; i++)); do
-            if [[ ${words[i]} == -@(f|-?(make)file) ]]; then
-                # Expand tilde expansion
-                local ret
-                _comp_dequote "${words[i + 1]-}" &&
-                    [[ -f ${ret-} ]] &&
-                    makef=(-f "$ret")
-                break
-            fi
-        done
+        _comp_get_option_arg -A -- "-@(f|-?(make)file)" &&
+            _comp_dequote "$ret" &&
+            [[ -f $ret ]] &&
+            makef=(-f "$ret")
 
         # recognise that possible completions are only going to be displayed so
         # only the base name is shown.

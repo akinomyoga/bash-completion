@@ -17,22 +17,10 @@ _comp_cmd_mutt__addresses()
 # TODO:API: rename per conventions, rework to use vars rather than outputting
 _muttrc()
 {
-    local muttrc=
     # Search COMP_WORDS for '-F muttrc' or '-Fmuttrc' argument
-    set -- "${words[@]}"
-    while (($# > 0)); do
-        if [[ $1 == -F* ]]; then
-            local ret
-            if ((${#1} > 2)); then
-                _comp_dequote "${1:2}" && muttrc=$ret
-            else
-                shift
-                [[ ${1-} ]] && _comp_dequote "$1" && muttrc=$ret
-            fi
-            break
-        fi
-        shift
-    done
+    local ret
+    _comp_get_option_arg -A -- "-F" && _comp_dequote "$ret"
+    local muttrc=$ret
 
     if [[ ! $muttrc ]]; then
         if [[ -f ~/.${muttcmd}rc ]]; then
