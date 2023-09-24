@@ -196,9 +196,74 @@ _comp_cmd_mount()
                     ;;&
             esac
             # COMP_WORDBREAKS is a real pain in the ass
-            if ((${#COMPREPLY[@]})) && [[ $prefix == *["$COMP_WORDBREAKS"]* ]]; then
-              local tmp=${prefix%["$COMP_WORDBREAKS"]*}
-              COMPREPLY=("${COMPREPLY[@]#"$tmp"?}")
+            #
+            # TODO: We need to consider many cases for COMP_WORDBREAKS. The
+            # test cases are the following, where Bash expects the completion
+            # for the part indicated by ~:
+            #
+            #   #1 mount -o abort,var=value,auto_[TAB]
+            #                         ~~~~~~~~~~~
+            #
+            #   #2 mount -o 'abort',auto_[TAB]
+            #               ~~~~~~~~~~~~~
+            #
+            #   #3 mount -o 'var=value',auto_[TAB]
+            #               ~~~~~~~~~~~~~~~~~
+            #
+            #   #4 mount -o abort,'auto_[TAB]
+            #                      ~~~~~
+            #
+            # We can think about several solutions, but none seems to work
+            # currently.
+            #
+            # a The current code removes `*[$COMP_WORDBREAKS]` from the prefix.
+            #
+            #   if ((${#COMPREPLY[@]})) && [[ $prefix == *["$COMP_WORDBREAKS"]* ]]; then
+            #       local tmp=${prefix%[:=]*}
+            #       COMPREPLY=("${COMPREPLY[@]#"$tmp"?}")
+            #   fi
+            #
+            # b One possible solution is to remove `*[:=]` instead of
+            #   `*[$COMP_WORDBREAKS]` from the prefix.  This will make #1 and
+            #   #2 work correctly, but still #3 does not work in this case.
+            #
+            #   if ((${#COMPREPLY[@]})) && [[ $prefix == *[:=]* ]]; then
+            #       local tmp=${prefix%["$COMP_WORDBREAKS"]*}
+            #       COMPREPLY=("${COMPREPLY[@]#"$tmp"?}")
+            #   fi
+            #
+            # c Then to handle #3, one might consider remove only unquoted
+            #   [:=], but it would be technically difficult to preserve quoted
+            #   [:=].  In addition, even with this can be achieved, #4 will not
+            #   be fixed.
+            #
+            # d Or do nothing here for now.
+            #
+            # e One can use `comp_args[1]` to see which part Bash thinks is the
+            #   completed part.
+            #
+            #   However this still has a problem.  When the starting point of
+            #   the completion is in the middle of a field after a comma, one
+            #   first needs to generate the candidates and then remove the
+            #   prefix that is not considered the completed part.  The problem
+            #   is that the generated candidates do not necessarily match the
+            #   original text because the builtin compgen can remove the quotes
+            #   even if we specify the quoted word as the current word.  For
+            #   example, for #4, `${comp_args[1]}` becomes `auto_`.  Then we
+            #   attempt `compgen -P abort, -W auto_da_alloc -- "'auto_"` to
+            #   obtain `abort,auto_da_alloc`, where we cannot remove `abort,'`
+            #   because the single quote is missing.
+            #
+            # |   |  #1  |  #2  |  #3  |  #4  |
+            # |:--|:----:|:----:|:----:|:----:|
+            # | a |  ok  | fail | fail | fail |
+            # | b |  ok  |  ok  | fail | fail |
+            # | c |  ok  |  ok  |  ok  | fail |
+            # | d | fail |  ok  |  ok  | fail |
+            #
+            if ((${#COMPREPLY[@]})) && [[ $prefix == *[:=]* ]]; then
+                local tmp=${prefix%[:=]*}
+                COMPREPLY=("${COMPREPLY[@]#"$tmp"?}")
             fi
             [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
             return
