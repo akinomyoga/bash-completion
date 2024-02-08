@@ -1,5 +1,4 @@
 import pytest
-from conftest import assert_bash_exec
 
 
 class TestGdb:
@@ -15,10 +14,8 @@ class TestGdb:
         )
 
     @pytest.mark.complete("gdb aw")
-    def test_3(self, bash, completion):
+    def test_3(self, completion):
         """Check that the completion can generate command names"""
-        # assert_bash_exec(bash, 'echo "PATH=$PATH"', want_output=False)
-        assert_bash_exec(bash, "compgen -c -- aw | sort -u", want_output=False)
         assert completion == ["k"] or "awk" in completion
 
     @pytest.mark.complete("gdb built")
