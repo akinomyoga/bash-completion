@@ -30,8 +30,7 @@ _comp_cmd_gdb()
                 # Note: ${v+"$@"} does not work with empty IFS in bash < 4.4
                 IFS=$' \t\n'
                 find ${path_array[@]+"${path_array[@]}"} . -mindepth 1 \
-                    -maxdepth 1 -not -type d -executable -printf '%f\n' \
-                    2>/dev/null
+                    -maxdepth 1 -not -type d -executable -printf '%f\n'
             )"
         fi
     elif ((cword == 2)); then
