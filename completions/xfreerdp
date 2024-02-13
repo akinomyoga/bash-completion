@@ -30,10 +30,12 @@ _comp_cmd_xfreerdp()
 
     case $cur in
         /kbd:*)
-            local v="$(xfreerdp /kbd-list 2>/dev/null)"
-            declare -p v >&2
             _comp_compgen -c "${cur#/kbd:}" split -- "$("$1" /kbd-list 2>/dev/null |
                 _comp_awk '/^0x/ { print $1 }')"
+            if ((${#COMPREPLY[@]} == 0)); then
+                local v="$(xfreerdp /kbd-list 2>/dev/null)"
+                declare -p v >&2
+            fi
             return
             ;;
         /bpp:*)
