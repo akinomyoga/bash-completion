@@ -27,6 +27,10 @@ class TestIp:
     def test_netconf(self, completion):
         assert "show" in completion
 
+    @pytest.mark.complete("ip addr show type ", require_cmd=True)
+    def test_addr_type(self, completion):
+        assert "bridge" in completion
+
     @pytest.mark.complete("ip -", require_cmd=True)
     def test_options(self, completion):
         assert "-family" in completion
