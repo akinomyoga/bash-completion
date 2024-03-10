@@ -3203,8 +3203,11 @@ _comp_load()
 
     # Look up and source
     [[ $1 == bin/cmd1 ]] && {
-        declare -p dirs
-        ls -l "${dirs[@]}"
+        ls -ld "${dirs[@]}"
+        _comp_realcommand "$cmd" &&
+            local test1_path=${REPLY%/*} &&
+            local test2_path=${test1_path%/*}/share/bash-completion/completions
+        declare -p test1_path test2_path
     } >&2
     shift
     local i prefix compspec
