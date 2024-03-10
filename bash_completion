@@ -3202,6 +3202,10 @@ _comp_load()
     local IFS=$' \t\n'
 
     # Look up and source
+    [[ $1 == bin/cmd1 ]] && {
+        declare -p dirs
+        ls -l "${dirs[@]}"
+    } >&2
     shift
     local i prefix compspec
     for prefix in "" _; do # Regular from all dirs first, then fallbacks
