@@ -3207,7 +3207,12 @@ _comp_load()
         _comp_realcommand "$cmd" &&
             local test1_path=${REPLY%/*} &&
             local test2_path=${test1_path%/*}/share/bash-completion/completions
-        declare -p test1_path test2_path
+        declare -p cmd test1_path test2_path
+        echo "pwd:$(pwd)"
+        ls -l "$cmd"
+        echo "realpath:$(realpath "$cmd")"
+        echo "greadlink:$(greadlink -f "$cmd")"
+        echo "readlink:$(readlink -f "$cmd")"
     } >&2
     shift
     local i prefix compspec
