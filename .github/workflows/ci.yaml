@@ -43,13 +43,6 @@ jobs:
       matrix:
         include:
           - dist: alpine
-          - dist: centos7
-          - dist: debian10
-          - dist: debian10
-            bsd: true
-            network: none
-          - dist: fedoradev
-          - dist: ubuntu14
     steps:
       - uses: actions/checkout@v4
       - uses: google-github-actions/release-please-action@v4
