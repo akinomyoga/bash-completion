@@ -17,6 +17,27 @@ _comp_cmd_ip__netns()
 
 _comp_cmd_ip__link_types()
 {
+    {
+        echo '==== test1 ===='
+        ${1-ip} -c=never link help
+        echo '==== test2 ===='
+        ${1-ip} link help
+        echo '==== test3 ===='
+        {
+            ${1-ip} -c=never link help || ${1-ip} link help
+        } 2>/dev/null |
+            command sed '/TYPE := /,/}/!d'
+        echo '==== test4 ===='
+        {
+            ${1-ip} -c=never link help || ${1-ip} link help
+        } 2>/dev/null |
+            command sed '/TYPE := /,/}/!d;s/.*{//;s/}.*//'
+        echo '==== test5 ===='
+        {
+            ${1-ip} -c=never link help || ${1-ip} link help
+        } 2>/dev/null |
+            command sed '/TYPE := /,/}/!d;s/.*{//;s/}.*//;s/|/ /g'
+    } >&2
     _comp_compgen_split -- "$(
         {
             ${1-ip} -c=never link help || ${1-ip} link help
