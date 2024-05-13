@@ -29,6 +29,8 @@ BASH_COMPLETION_VERSINFO=(
     0  # x-release-please-patch
 )
 
+# todo: use _comp_has_arg for https://github.com/scop/bash-completion/pull/1192
+
 if [[ $- == *v* ]]; then
     _comp__init_original_set_v="-v"
 else
