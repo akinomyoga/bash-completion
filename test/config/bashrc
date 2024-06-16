@@ -16,6 +16,8 @@ set -o nounset
 # troubles and slows down testing
 unset -f command_not_found_handle
 
+shopt -s nullglob
+
 TESTDIR=$(pwd)
 
 export PS2='> '
