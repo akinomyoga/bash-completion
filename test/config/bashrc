@@ -16,7 +16,7 @@ set -o nounset
 # troubles and slows down testing
 unset -f command_not_found_handle
 
-shopt -s nullglob
+shopt -s localvar_inherit 2>/dev/null
 
 TESTDIR=$(pwd)
 
