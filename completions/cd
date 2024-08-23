@@ -46,9 +46,8 @@ _comp_cmd_cd()
     _comp_compgen -a filedir -d
 
     if ((${#COMPREPLY[@]} == 1)); then
-        i=${COMPREPLY[0]}
-        if [[ $i == "$cur" && $i != "*/" ]]; then
-            COMPREPLY[0]="${i}/"
+        if [[ ${COMPREPLY[0]} == "$cur" ]]; then
+            COMPREPLY[0]+=/
         fi
     fi
 }
