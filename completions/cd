@@ -46,9 +46,13 @@ _comp_cmd_cd()
     fi
 
     _comp_compgen -a filedir -d
+
+    local vars
+    if shopt -q cdable_vars && [[ $cur =~ ^([_a-zA-Z][_a-zA-Z0-9]*)?$ ]] && _comp_compgen -v vars -- -v; then
+        k=${#COMPREPLY[@]}
+        for i in "${vars[@]}"; do
+            [[ -d ${!i} ]] && COMPREPLY[k++]=$i
+        done
+    fi
 }
-if shopt -q cdable_vars; then
-    complete -v -F _comp_cmd_cd -o nospace cd pushd
-else
-    complete -F _comp_cmd_cd -o nospace cd pushd
-fi
+complete -F _comp_cmd_cd -o nospace cd pushd
