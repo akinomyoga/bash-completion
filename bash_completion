@@ -3449,9 +3449,8 @@ _comp_load()
     done
     shift "$((OPTIND - 1))"
 
-    local cmd=$1 cmdname=${1##*/} dir compfile
+    local cmd=$1 dir compfile
     local -a paths
-    [[ $cmdname ]] || return 1
 
     local backslash=
     if [[ $cmd == \\* ]]; then
@@ -3460,6 +3459,9 @@ _comp_load()
         $(complete -p -- "$cmd" 2>/dev/null || echo false) "\\$cmd" && return 0
         backslash=\\
     fi
+
+    local cmdname=${cmd##*/}
+    [[ $cmdname ]] || return 1
 
     # Resolve absolute path to $cmd
     local REPLY pathcmd origcmd=$cmd
