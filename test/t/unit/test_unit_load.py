@@ -140,5 +140,20 @@ class TestCompLoad:
             # and cause no output, unlike our `$PWD/prefix1/bin/sh` canary.
             assert_bash_exec(bash, "_comp_load sh", want_output=False)
 
+    def test_cmd_backslash(self, bash, fixture_dir):
+        with bash_env_saved(bash) as bash_env:
+            bash_env.chdir(fixture_dir)
+            bash_env.write_variable("PATH", "$PWD/bin:$PATH", quote=False)
+            assert_bash_exec(bash, "complete -r cmd1 cmd2")
+            output = assert_bash_exec(
+                bash, r"_comp_load '\cmd1'", want_output=True
+            )
+            assert output.strip() == "cmd1: sourced from prefix1"
+            output = assert_bash_exec(
+                bash, r"_comp_load '\cmd2'", want_output=True
+            )
+            assert output.strip() == "cmd2: sourced from prefix1"
+
     def test_option_like_cmd_name(self, bash):
         assert_bash_exec(bash, "! _comp_load -- --non-existent")
+
