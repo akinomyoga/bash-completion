@@ -3418,7 +3418,7 @@ _comp_load__visit_file()
             [[ $rawcmd != "$cmd" ]] && eval "$compspec \"\$rawcmd\""
             # If invoked without path, that one should be set, too
             # ...but let's not overwrite an existing one, if any
-            [[ $origcmd != */* ]] &&
+            [[ $origcmd != "$cmd" && $origcmd != "$rawcmd" ]] &&
                 ! complete -p -- "$origcmd" &>/dev/null &&
                 eval "$compspec \"\$origcmd\""
             return 0
