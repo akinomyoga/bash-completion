@@ -3387,7 +3387,7 @@ _comp__init_base_directory
 # @param $1 compfile ... filename to check.
 # @var[in] cmdname
 # @var[in] cmd
-# @var[in] backslash
+# @var[in] rawcmd
 # @var[in] origcmd
 # @var[in] source_args
 # @exit 0 when the file is found, and the completion setting was successfully
@@ -3413,8 +3413,9 @@ _comp_load__visit_file()
         # At least $cmd is expected to have a completion set when we return
         # successfully; see if it already does
         if compspec=$(complete -p -- "$cmd" 2>/dev/null); then
-            # $cmd is the case in which we do backslash processing
-            [[ $backslash ]] && eval "$compspec \"\$backslash\$cmd\""
+            # $rawcmd contains the raw shell word before processing
+            # backslash
+            [[ $rawcmd != "$cmd" ]] && eval "$compspec \"\$rawcmd\""
             # If invoked without path, that one should be set, too
             # ...but let's not overwrite an existing one, if any
             [[ $origcmd != */* ]] &&
@@ -3449,24 +3450,24 @@ _comp_load()
     done
     shift "$((OPTIND - 1))"
 
-    local cmd=$1 dir compfile
+    local rawcmd=$1 dir compfile
     local -a paths
 
-    local backslash=
-    if [[ $cmd == \\* ]]; then
-        cmd=${cmd:1}
+    # Unquote the beginning backslash
+    local origcmd=$rawcmd
+    if [[ $rawcmd == \\* ]]; then
+        origcmd=${rawcmd:1}
         # If we already have a completion for the "real" command, use it
-        $(complete -p -- "$cmd" 2>/dev/null || echo false) "\\$cmd" && return 0
-        backslash=\\
+        $(complete -p -- "$origcmd" 2>/dev/null || echo false) "$rawcmd" && return 0
     fi
 
-    local cmdname=${cmd##*/}
+    local cmdname=${origcmd##*/}
     [[ $cmdname ]] || return 1
 
     # Resolve absolute path to $cmd
-    local REPLY pathcmd origcmd=$cmd
-    if pathcmd=$(type -P -- "$cmd"); then
-        _comp_abspath "$pathcmd"
+    local REPLY cmd=$origcmd
+    if REPLY=$(type -P -- "$cmd"); then
+        _comp_abspath "$REPLY"
         cmd=$REPLY
     fi
 
@@ -3523,7 +3524,7 @@ _comp_load()
 
     # Look up simple "xspec" completions
     [[ -v _comp_xspecs[$cmdname] || -v _xspecs[$cmdname] ]] &&
-        complete -F _comp_complete_filedir_xspec "$cmdname" "$backslash$cmdname" && return 0
+        complete -F _comp_complete_filedir_xspec "$cmdname" "$rawcmd" && return 0
 
     if [[ $flag_fallback_default ]]; then
         complete -F _comp_complete_minimal -- "$origcmd" && return 0
