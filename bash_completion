@@ -2205,7 +2205,7 @@ _comp_compgen_services()
         systemctl list-units --full --all ||
             systemctl list-unit-files
     } 2>/dev/null |
-        _comp_awk '$1 ~ /\.service$/ { sub("\\.service$", "", $1); print $1 }')
+        _comp_awk 'sub(/\.service$/, "", $1) { print $1 }')
     _comp_compgen -a split -l -- "$_generated"
 
     if [[ -x /sbin/upstart-udev-bridge ]]; then
