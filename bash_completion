@@ -3508,15 +3508,17 @@ _comp_load()
     shift
     local -a source_args=("$@")
 
-    local i
-    for i in "${!dirs[@]}"; do
-        dir=${dirs[i]}/completions
-        [[ -d $dir ]] || continue
-        for compfile in "$cmdname.bash" "$cmdname"; do
-            _comp_load__visit_file "$dir/$compfile" && return 0
-        done
+    local dir
+    for dir in "${dirs[@]}"; do
+        _comp_load__visit_file "$dir/completions/$cmdname.bash" && return 0
     done
+
     _comp_load__visit_file "$_comp__base_directory/completions-core/$cmdname.bash" && return 0
+
+    for dir in "${dirs[@]}"; do
+        _comp_load__visit_file "$dir/completions/$cmdname" && return 0
+    done
+
     _comp_load__visit_file "$_comp__base_directory/completions-fallback/$cmdname.bash" && return 0
 
     # Look up simple "xspec" completions
