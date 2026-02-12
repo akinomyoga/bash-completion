@@ -25,6 +25,7 @@ _comp_cmd_zopflipng()
         return
     fi
 
+    local IFS=$' \t\n' # for ${words[*]}
     if [[ ${words[*]} != *\ --prefix=* ]]; then
         # 2 png args only if --prefix not given
         local REPLY

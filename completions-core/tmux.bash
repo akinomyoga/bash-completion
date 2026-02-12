@@ -52,6 +52,7 @@ _comp_cmd_tmux__parse_usage()
             "[-"*)
                 # One option that does take an argument.
                 if [[ ${words[i + 1]-} != *"]" ]]; then
+                    local IFS=$' \t\n' # for ${words[*]}
                     _comp_cmd_tmux__log \
                         "Can't parse option: '${words[*]:i:2}' in '$1'"
                     break

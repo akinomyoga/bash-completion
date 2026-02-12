@@ -96,6 +96,7 @@ _comp_cmd_fio()
         --?*)
             local -a cmdhelp
             _comp_split -l cmdhelp "$("$1" --cmdhelp="${prev#--}" 2>/dev/null)"
+            local IFS=$' \t\n' # for ${cmdhelp[*]-}
             case ${cmdhelp[*]-} in
                 *"showing closest match"*)
                     # ignore

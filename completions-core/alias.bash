@@ -5,6 +5,7 @@ _comp_cmd_alias()
     local cur prev words cword comp_args
     _comp_initialize -n = -- "$@" || return
 
+    local IFS=$' \t\n' # for ${words[*]}
     case "${words[*]}" in
         *" -p "*)
             return

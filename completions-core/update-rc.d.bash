@@ -11,6 +11,7 @@ _comp_cmd_update_rc_d()
     _comp_compgen -v services sysv_services
     options=(-f -n)
 
+    local IFS=$' \t\n' # for ${services[*]}
     if [[ $cword -eq 1 || $prev == -* ]]; then
         local IFS='|'
         _comp_compgen -- -W '"${options[@]}" ${services[@]+"${services[@]}"}' \

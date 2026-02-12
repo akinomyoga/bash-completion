@@ -10,6 +10,7 @@ _comp_cmd_nc()
             return
             ;;
         -*s)
+            local IFS=$' \t\n' # for ${words[*]}
             if [[ ${words[*]} == *-6* ]]; then
                 _comp_compgen_ip_addresses -6
             else

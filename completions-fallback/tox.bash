@@ -13,6 +13,7 @@ _comp_cmd_tox()
     _comp_initialize -- "$@" || return
 
     # Complete defaults following a "--"
+    local IFS=$' \t\n' # for ${words[*]}
     if [[ "${words[*]:0:cword} " == *\ --\ * && $cur != -- ]]; then
         compopt -o bashdefault -o default
         return
