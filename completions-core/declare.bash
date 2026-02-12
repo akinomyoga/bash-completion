@@ -11,7 +11,7 @@ _comp_cmd_declare()
         # Most options also have a '+' form.
         # We'll exclude the ones that don't with compgen.
         opts+=("${opts[@]/-/+}")
-        _comp_compgen -- -W "${opts[*]}" -X '+[Ffgp]'
+        _comp_compgen -- -W '"${opts[@]}"' -X '+[Ffgp]'
         return
     fi
 
