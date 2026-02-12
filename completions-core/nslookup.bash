@@ -97,7 +97,7 @@ _comp_cmd_host()
         local ipvx=""
         [[ ${words[*]} =~ \ -[^\ ]*([46]) ]] && ipvx=-${BASH_REMATCH[1]}
         # shellcheck disable=SC2086
-        _comp_compgen_known_hosts $ipvx -- "$cur"
+        _comp_compgen_known_hosts ${ipvx:+"$ipvx"} -- "$cur"
     fi
 } &&
     complete -F _comp_cmd_host host
