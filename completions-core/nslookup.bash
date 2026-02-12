@@ -94,10 +94,9 @@ _comp_cmd_host()
     if ((REPLY == 1)); then
         _comp_compgen_known_hosts
     elif ((REPLY == 2)); then
-        local ipvx
+        local ipvx=""
         [[ ${words[*]} =~ \ -[^\ ]*([46]) ]] && ipvx=-${BASH_REMATCH[1]}
-        # shellcheck disable=SC2086
-        _comp_compgen_known_hosts ${ipvx-}
+        _comp_compgen_known_hosts $ipvx
     fi
 } &&
     complete -F _comp_cmd_host host
