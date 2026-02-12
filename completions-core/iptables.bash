@@ -8,7 +8,7 @@ _comp_cmd_iptables()
     local table="" chain='s/^Chain \([^ ]\{1,\}\).*$/\1/p'
     local targets='ACCEPT DROP LOG ULOG REJECT'
 
-    local IFS=$' \t\n' # for ${table:+-t "$table"}
+    local IFS=$' \t\n' # for ${words[*]} and ${table:+-t "$table"}
     [[ ${words[*]} =~ [[:space:]]-(t|-table=?)[[:space:]]*([^[:space:]]+) ]] &&
         table=${BASH_REMATCH[2]}
 

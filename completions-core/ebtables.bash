@@ -8,7 +8,7 @@ _comp_cmd_ebtables()
     local table="" chain='s/^Bridge chain: \([^ ,]\{1,\}\).*$/\1/p' \
         targets='ACCEPT DROP CONTINUE RETURN'
 
-    local IFS=$' \t\n' # for ${table:+-t "$table"}
+    local IFS=$' \t\n' # for ${words[*]} and ${table:+-t "$table"}
     [[ ${words[*]} =~ [[:space:]]-(t|-table=?)[[:space:]]*([^[:space:]]+) ]] &&
         table=${BASH_REMATCH[2]}
 
