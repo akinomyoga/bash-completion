@@ -3470,15 +3470,15 @@ _comp_load()
         cmd=$REPLY
     fi
 
-    local -a dirs=()
+    local -a user_dirs=() dirs=()
 
     # Lookup order:
     # 1) From BASH_COMPLETION_USER_DIR (e.g. ~/.local/share/bash-completion):
     # User installed completions.
     if [[ ${BASH_COMPLETION_USER_DIR-} ]]; then
-        _comp_split -F : dirs "$BASH_COMPLETION_USER_DIR"
+        _comp_split -F : user_dirs "$BASH_COMPLETION_USER_DIR"
     else
-        dirs=("${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion")
+        user_dirs=("${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion")
     fi
 
     # 2) From the location of bash_completion: Completions relative to the main
@@ -3508,17 +3508,20 @@ _comp_load()
     shift
     local -a source_args=("$@")
 
-    local dir
+    local dir IFS=$' \t\n'
+    for dir in ${user_dirs[@]+"${user_dirs[@]}"}; do
+        _comp_load__visit_file "$dir/completions/$cmdname.bash" && return 0
+        _comp_load__visit_file "$dir/completions/$cmdname" && return 0
+    done
+
     for dir in "${dirs[@]}"; do
         _comp_load__visit_file "$dir/completions/$cmdname.bash" && return 0
     done
-
     _comp_load__visit_file "$_comp__base_directory/completions-core/$cmdname.bash" && return 0
 
     for dir in "${dirs[@]}"; do
         _comp_load__visit_file "$dir/completions/$cmdname" && return 0
     done
-
     _comp_load__visit_file "$_comp__base_directory/completions-fallback/$cmdname.bash" && return 0
 
     # Look up simple "xspec" completions
