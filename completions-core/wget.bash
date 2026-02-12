@@ -39,10 +39,9 @@ _comp_cmd_wget()
                     excludes+=(ascii)
                     ;;
             esac
-            local excludes_str=$(
-                export IFS='|'
-                echo "${excludes[*]}"
-            )
+            local IFS='|'
+            local excludes_str="${excludes[*]}"
+            IFS=$' \t\n'
 
             # prevopt is the previous options string used as a prefix
             # to avoid COMPREPLY replacing them with the $lastopt completion
