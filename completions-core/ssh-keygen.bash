@@ -5,7 +5,7 @@ _comp_cmd_ssh_keygen()
     local cur prev words cword comp_args
     _comp_initialize -n := -- "$@" || return
 
-    local IFS=$' \t\n' # for ${words[*]}
+    local IFS=$' \t\n' # for ${words[*]} and ${protocols[*]}
     local noargopts='!(-*|*[ aCIJjMNPSVWzbEFRDwfGKsTmnOrtYZ]*)'
     # shellcheck disable=SC2254
     case $prev in

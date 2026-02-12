@@ -1190,7 +1190,7 @@ _comp_get_words()
     }
     [[ $vwords ]] && {
         # Note: bash < 4.4 has a bug that all the elements are connected with
-        # ${v+"$@"} when IFS does not contain whitespace.
+        # ${v+"$@"} when IFS is empty.
         local IFS=$' \t\n'
         upvars+=("$vwords")
         upargs+=(-a"${#words[@]}" "$vwords" ${words+"${words[@]}"})
@@ -1389,7 +1389,7 @@ _comp_compgen_filedir()
     fi
 
     # Note: bash < 4.4 has a bug that all the elements are connected with
-    # ${v+"${a[@]}"} when IFS does not contain whitespace.
+    # ${v+"${a[@]}"} when IFS is empty.
     local IFS=$' \t\n'
     _comp_compgen -U toks set ${toks[@]+"${toks[@]}"}
 }
