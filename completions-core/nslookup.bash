@@ -96,7 +96,7 @@ _comp_cmd_host()
     elif ((REPLY == 2)); then
         local ipvx=""
         [[ ${words[*]} =~ \ -[^\ ]*([46]) ]] && ipvx=-${BASH_REMATCH[1]}
-        _comp_compgen_known_hosts $ipvx
+        _comp_compgen_known_hosts ${ipvx:+"$ipvx"}
     fi
 } &&
     complete -F _comp_cmd_host host

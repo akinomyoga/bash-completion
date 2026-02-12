@@ -381,7 +381,8 @@ _comp_cmd_ssh()
             compopt -o filenames
             _comp_compgen_commands
         else
-            _comp_compgen_known_hosts ${ipvx-} -a ${configfile:+-F "$configfile"}
+            _comp_compgen_known_hosts ${ipvx:+"$ipvx"} -a \
+                ${configfile:+-F "$configfile"}
         fi
     fi
 } &&
@@ -707,7 +708,7 @@ _comp_cmd_scp()
                 ;;
             *)
                 if ! _comp_looks_like_path "$cur"; then
-                    _comp_compgen_known_hosts ${ipvx-} -c -a \
+                    _comp_compgen_known_hosts ${ipvx:+"$ipvx"} -c -a \
                         ${configfile:+-F "$configfile"}
                 fi
                 ;;
