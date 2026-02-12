@@ -7,6 +7,7 @@ _comp_cmd_wtf()
     _comp_initialize -- "$@" || return
 
     [[ $prev == -f ]] && _comp_compgen_filedir && return
+    local IFS=$' \t\n' # for ${words[*]}
     [[ ${words[*]} == *\ -f* ]] && addf= || addf=-f
     if [[ $cur == -* ]]; then
         COMPREPLY=(${addf:+"$addf"})

@@ -85,6 +85,7 @@ _comp_xfunc_ssh_compgen_options()
     )
     local -a protocols
     _comp_compgen -v protocols -i ssh query ssh protocol-version
+    local IFS=$' \t\n' # for ${protocols[*]}
     if [[ ${protocols[*]-} == *1* ]]; then
         _opts+=(Cipher CompressionLevel Protocol RhostsRSAAuthentication
             RSAAuthentication)

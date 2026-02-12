@@ -32,6 +32,7 @@ _comp_cmd_tree()
         return
     fi
 
+    local IFS=$' \t\n' # for ${words[*]}
     # Note: bash-4.2 has a bug with [[ ${arr[*]} == *text* ]], so we
     # assign ${words[*]} in a temporary variable "line".
     local line="${words[*]}"

@@ -33,6 +33,7 @@ _comp_cmd_secret_tool()
 
     case $mode in
         store)
+            local IFS=$' \t\n' # for ${words[*]}
             if [[ ${words[*]} != *\ --label[\ =]* ]]; then
                 _comp_compgen -- -W "--label="
                 [[ ${COMPREPLY-} == *= ]] && compopt -o nospace

@@ -171,6 +171,7 @@ _comp_cmd_rpm()
                 --supplements --filetriggers --licensefiles
             )
 
+            local IFS=$' \t\n' # for ${words[*]}
             if [[ ${words[*]} == *\ -@(*([^ -])f|-file )* ]]; then
                 # -qf completion
                 if [[ $cur == -* ]]; then
@@ -212,6 +213,7 @@ _comp_cmd_rpm()
             fi
             ;;
         -[Vy]* | --verify)
+            local IFS=$' \t\n' # for ${words[*]}
             if [[ $cur == -* ]]; then
                 _comp_compgen -- -W '"${opts[@]}" --root= --dbpath --nodeps
                     --nogroup --nolinkto --nomode --nomtime --nordev --nouser

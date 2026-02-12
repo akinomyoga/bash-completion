@@ -95,6 +95,7 @@ _comp_cmd_host()
         _comp_compgen_known_hosts -- "$cur"
     elif ((REPLY == 2)); then
         local ipvx=""
+        local IFS=$' \t\n' # for ${words[*]}
         [[ ${words[*]} =~ \ -[^\ ]*([46]) ]] && ipvx=-${BASH_REMATCH[1]}
         # shellcheck disable=SC2086
         _comp_compgen_known_hosts ${ipvx:+"$ipvx"} -- "$cur"

@@ -41,6 +41,7 @@ _comp_cmd_crontab()
     fi
 
     # do filenames only if we did not have -l, -r, or -e
+    local IFS=$' \t\n' # for ${words[*]}
     [[ ${words[*]} == *\ -[lre]* ]] || _comp_compgen_filedir
 } &&
     complete -F _comp_cmd_crontab crontab
