@@ -12,7 +12,7 @@ _comp_cmd_secret_tool()
 
     local -i i
     local mode="" has_mode="" word
-    for i in ${!words[*]}; do
+    for i in "${!words[@]}"; do
         if [[ $i -gt 0 && ${words[i]} != -* ]]; then
             ((i != cword)) && mode=${words[i]} has_mode=set
             break
