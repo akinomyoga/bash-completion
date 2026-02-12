@@ -24,8 +24,8 @@ _comp_cmd_geoiplookup()
         return
     fi
 
-    local ipvx
-    [[ $1 == *6 ]] && ipvx=-6 || ipvx=-4
+    local ipvx=-4
+    [[ $1 == *6 ]] && ipvx=-6
     _comp_compgen_known_hosts $ipvx -- "$cur"
 } &&
     complete -F _comp_cmd_geoiplookup geoiplookup geoiplookup6

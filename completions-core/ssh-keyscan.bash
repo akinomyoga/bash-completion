@@ -5,7 +5,7 @@ _comp_cmd_ssh_keyscan()
     local cur prev words cword comp_args
     _comp_initialize -n = -- "$@" || return
 
-    local ipvx
+    local ipvx=""
 
     case $prev in
         -*4*)
@@ -46,6 +46,6 @@ _comp_cmd_ssh_keyscan()
         return
     fi
 
-    _comp_compgen_known_hosts ${ipvx-} -- "$cur"
+    _comp_compgen_known_hosts $ipvx -- "$cur"
 } &&
     complete -F _comp_cmd_ssh_keyscan ssh-keyscan

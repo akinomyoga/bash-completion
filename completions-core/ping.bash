@@ -5,7 +5,7 @@ _comp_cmd_ping()
     local cur prev words cword comp_args
     _comp_initialize -n = -- "$@" || return
 
-    local ipvx
+    local ipvx=""
 
     case $prev in
         -*[cFGghilmPpstVWwz])
@@ -64,6 +64,6 @@ _comp_cmd_ping()
 
     [[ $1 == *6 ]] && ipvx=-6
     [[ $1 == *4 ]] && ipvx=-4
-    _comp_compgen_known_hosts ${ipvx-} -- "$cur"
+    _comp_compgen_known_hosts $ipvx -- "$cur"
 } &&
     complete -F _comp_cmd_ping ping ping4 ping6
