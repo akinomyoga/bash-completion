@@ -9,10 +9,7 @@ gitgrep()
     local filter_list
     read -ra filter_list <<<"$filter_out"
     pathspecs+=("${filter_list[@]/#/":!:"}")
-    local out=$(
-        git grep -I -P -n "$1" -- "${pathspecs[@]}" |
-            grep -Pv ':[[:space:]]*(#|""")' # Ignore bash and python comments
-    )
+    local out=$(git grep -I -P -n "$1" -- "${pathspecs[@]}")
     if [[ $out ]]; then
         printf '***** %s\n' "$2"
         printf '%s\n\n' "$out"

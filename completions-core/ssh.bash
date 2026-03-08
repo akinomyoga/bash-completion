@@ -542,7 +542,7 @@ _comp_xfunc_scp_compgen_remote_files()
         #
         # In the following while-loop, we essentially do the following:
         #
-        #     REPLY=$(command sed -e 's/\\\\\\\('"$_comp_cmd_scp__path_esc"'\|$\)/\\\1/g' <<<"$REPLY")
+        #     REPLY=$(command sed -E 's/\\\\\\('"$_comp_cmd_scp__path_esc"'|$)/\\\1/g' <<<"$REPLY")
         #
         # We implement this by the Bash built-in features because POSIX BRE
         # does not support \|.  POSIX sed newly standardized the "-E" flag to
