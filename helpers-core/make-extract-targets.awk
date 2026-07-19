@@ -3,6 +3,8 @@
 # This AWK script is used by the function `_comp_cmd_make__extract_targets` in
 # `completions-core/make`.  This script receives the output of `make -npq' as
 # the input file or stdin and outputs the list of targets matching the prefix.
+# The phony targets are prefixed by "phony:", and the others are prefixed by
+# "file:".
 #
 # @env prefix         Specifies the prefix to match.
 # @env prefix_replace Specifies the string that replaces the prefix in the
@@ -14,6 +16,7 @@ BEGIN {
   prefix = ENVIRON["prefix"];
   prefix_replace = ENVIRON["prefix_replace"];
   is_target_block = 0;
+  is_phony_target = 0;
   target = "";
 }
 
@@ -37,7 +40,10 @@ NR == 1, /^# +Make data base/ { next; }
 #  should be output.
 
 # only process the targets the user wants.
-starts_with($0, prefix) { is_target_block = 1; }
+starts_with($0, prefix) {
+  is_target_block = 1;
+  is_phony_target = 0;
+}
 is_target_block == 0 { next; }
 
 /^# +File is an intermediate prerequisite/ { # cancel the block
@@ -46,11 +52,25 @@ is_target_block == 0 { next; }
   next;
 }
 
+# The comment sections after the .PHONY targets include the following
+# line, which was confirmed in make-3.80 (2002) and make-4.4.1 (2023):
+#
+# #  Phony target (prerequisite of .PHONY).
+#
+/^# +Phony target/ {
+  is_phony_target = 1;
+  next;
+}
+
 # end of target block
 /^$/ {
   is_target_block = 0;
   if (target != "") {
-    print target;
+    if (is_phony_target) {
+      print "phony:" target;
+    } else {
+      print "file:" target;
+    }
     target = "";
   }
   next;

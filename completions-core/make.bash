@@ -1,7 +1,14 @@
 # bash completion for GNU make
 
 # Extract the valid target names starting with PREFIX from the output of
-# `make -npq'
+# `make -npq'.
+#
+# The standard output consists of two types of lines, the ones starting with
+# "file:" and starting with "phony:".  The former contains non-phony target
+# names, which are supposed to be the filepaths created by make recipes.  The
+# latter contains the phony target names, which is specified by ".PHONY:" in
+# the makefile.
+#
 # @param mode    If this is `-d', the directory names already specified in
 #                PREFIX are omitted in the output
 # @param prefix  Prefix of the target names
@@ -36,13 +43,24 @@ _comp_cmd_make__truncate_non_unique_paths()
     local prefix=$cur
     [[ $mode == -d ]] && prefix=
 
+    COMPREPLY=()
+    local nreply=0
+
     # collect the possible completions including the directory names in
     # `paths' and count the number of children of each subdirectory in
     # `nchild'.
     local -A paths nchild
     local target
     for target in "${targets[@]}"; do
-        local path=${target%/}
+        if [[ $target == phony:* ]]; then
+            # The phony targets are directly added to COMPRELY without
+            # considering the pathname structures with slashes.
+            COMPREPLY[nreply++]=${target#target:}
+            continue
+        fi
+
+        local path=${target#file:}
+        path=${path%/}
         while [[ ! ${paths[$path]+set} ]] &&
             paths[$path]=set &&
             [[ $path == "$prefix"*/* ]]; do
@@ -51,8 +69,6 @@ _comp_cmd_make__truncate_non_unique_paths()
         done
     done
 
-    COMPREPLY=()
-    local nreply=0
     for target in "${!paths[@]}"; do
         # generate only the paths that do not have a unique child and whose
         # all parent and ancestor directories have a unique child.
